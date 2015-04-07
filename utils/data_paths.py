@@ -3,8 +3,13 @@ import os
 
 ROOT_DIR_PATH = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
-ALL_DATA_FILE_PATH = os.path.join(ROOT_DIR_PATH, 'data/mu/all.dta')
-ALL_INDEX_FILE_PATH = os.path.join(ROOT_DIR_PATH, 'data/mu/all.idx')
-BASE_DATA_FILE_PATH = os.path.join(ROOT_DIR_PATH, 'data/mu/base.dta')
-HIDDEN_DATA_FILE_PATH = os.path.join(ROOT_DIR_PATH, 'data/mu/hidden.dta')
-PROBE_DATA_FILE_PATH = os.path.join(ROOT_DIR_PATH, 'data/mu/probe.dta')
+DATA_DIR_PATH = os.path.join(ROOT_DIR_PATH, 'data')
+DATA_MOVIE_USER_DIR_PATH = os.path.join(DATA_DIR_PATH, 'mu')
+DATA_USER_MOVIE_DIR_PATH = os.path.join(DATA_DIR_PATH, 'um')
+SUBMISSIONS_DIR_PATH = os.path.join(ROOT_DIR_PATH, 'submissions')
+
+ALL_DATA_FILE_PATH = os.path.join(DATA_MOVIE_USER_DIR_PATH, 'all.dta')
+ALL_INDEX_FILE_PATH = os.path.join(DATA_MOVIE_USER_DIR_PATH, 'all.idx')
+BASE_DATA_FILE_PATH = os.path.join(DATA_MOVIE_USER_DIR_PATH, 'base.dta')
+HIDDEN_DATA_FILE_PATH = os.path.join(DATA_MOVIE_USER_DIR_PATH, 'hidden.dta')
+PROBE_DATA_FILE_PATH = os.path.join(DATA_MOVIE_USER_DIR_PATH, 'probe.dta')
