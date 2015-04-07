@@ -17,7 +17,7 @@ def run():
                 print(rating_count)
             rating_sum += int(line.split()[3])
     rating_average = rating_sum / rating_count
-    ratings = ['{:4g}\n'.format(rating_average)] * 2749898
+    ratings = ['{:.3f}\n'.format(rating_average)] * 2749898
     with open('all_average.dta', 'w+') as all_threes_submission_file:
         all_threes_submission_file.writelines(ratings)
 
