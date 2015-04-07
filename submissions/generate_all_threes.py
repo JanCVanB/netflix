@@ -1,4 +1,4 @@
-"""Generate all_threes.dta submission file
+"""Generate all_threes.dta submission file with every rating as 3.0
 
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 """
