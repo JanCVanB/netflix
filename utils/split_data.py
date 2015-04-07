@@ -2,15 +2,11 @@
 
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 """
-import os
-from utils import constants
+from utils.data_paths import BASE_DATA_FILE_PATH, HIDDEN_DATA_FILE_PATH, PROBE_DATA_FILE_PATH
 
 
 def run():
-    root_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-    new_paths = [constants.BASE_DATA_FILE_PATH, constants.HIDDEN_DATA_FILE_PATH, constants.PROBE_DATA_FILE_PATH]
-    for i, new_path in enumerate(new_paths):
-        new_paths[i] = os.path.join(root_dir, new_path)
+    new_paths = [BASE_DATA_FILE_PATH, HIDDEN_DATA_FILE_PATH, PROBE_DATA_FILE_PATH]
     for new_path in new_paths:
         open(new_path, 'a').close()
 
