@@ -1,6 +1,6 @@
 """Generate all_threes.dta submission file with every rating as 3.0
 
-.. moduleauthor:: Quinn Osha stolen from Jan Van Bruggen <jancvanbruggen@gmail.com>
+.. moduleauthor:: Quinn Osha totes stolen from Jan Van Bruggen <jancvanbruggen@gmail.com>
 """
 
 
