@@ -1,13 +1,13 @@
 def help_first_n_indices_of_generator_are_correct(data_point_generator, number_of_points, correct_index):
     from itertools import islice
-    from utils.data_io import data_points
+    from utils.data_io import data_points, indices
     from utils.data_paths import ALL_DATA_FILE_PATH, ALL_INDEX_FILE_PATH
     all_data = data_points(ALL_DATA_FILE_PATH)
-    all_indices = data_points(ALL_INDEX_FILE_PATH)
+    all_indices = indices(ALL_INDEX_FILE_PATH)
     data_point = islice(data_point_generator, 0, number_of_points)
     for data_point in data_point:
         for some_point in all_data:
-            index = int(next(all_indices)[0])
+            index = next(all_indices)
             if index == correct_index:
                 assert data_point == some_point
                 break
