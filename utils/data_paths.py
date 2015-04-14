@@ -10,6 +10,3 @@ SUBMISSIONS_DIR_PATH = os.path.join(ROOT_DIR_PATH, 'submissions')
 
 ALL_DATA_FILE_PATH = os.path.join(DATA_MOVIE_USER_DIR_PATH, 'all.dta')
 ALL_INDEX_FILE_PATH = os.path.join(DATA_MOVIE_USER_DIR_PATH, 'all.idx')
-BASE_DATA_FILE_PATH = os.path.join(DATA_MOVIE_USER_DIR_PATH, 'base.dta')
-HIDDEN_DATA_FILE_PATH = os.path.join(DATA_MOVIE_USER_DIR_PATH, 'hidden.dta')
-PROBE_DATA_FILE_PATH = os.path.join(DATA_MOVIE_USER_DIR_PATH, 'probe.dta')
