@@ -58,6 +58,32 @@ def test_hidden_points_returns_a_generator():
     assert isinstance(hidden_points(), GeneratorType)
 
 
+def test_probe_points_first_ten_are_correct():
+    from utils.constants import PROBE_INDEX
+    from utils.data_io import probe_points
+    help_first_n_indices_of_generator_are_correct(probe_points(), number_of_points=10, correct_index=PROBE_INDEX)
+
+
+def test_probe_points_returns_a_generator():
+    from types import GeneratorType
+    from utils.data_io import probe_points
+
+    assert isinstance(probe_points(), GeneratorType)
+
+
+def test_qual_points_first_ten_are_correct():
+    from utils.constants import QUAL_INDEX
+    from utils.data_io import qual_points
+    help_first_n_indices_of_generator_are_correct(qual_points(), number_of_points=10, correct_index=QUAL_INDEX)
+
+
+def test_qual_points_returns_a_generator():
+    from types import GeneratorType
+    from utils.data_io import qual_points
+
+    assert isinstance(qual_points(), GeneratorType)
+
+
 def test_valid_points_first_ten_are_correct():
     from utils.constants import VALID_INDEX
     from utils.data_io import valid_points

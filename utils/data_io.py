@@ -37,6 +37,18 @@ def indices(index_file_path):
             yield int(line.strip())
 
 
+def probe_points():
+    from utils.constants import PROBE_INDEX
+    for point in _generate_points_from_index(PROBE_INDEX):
+        yield point
+
+
+def qual_points():
+    from utils.constants import QUAL_INDEX
+    for point in _generate_points_from_index(QUAL_INDEX):
+        yield point
+
+
 def valid_points():
     from utils.constants import VALID_INDEX
     for point in _generate_points_from_index(VALID_INDEX):
