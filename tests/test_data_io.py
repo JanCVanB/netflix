@@ -142,3 +142,31 @@ def test_write_submission_writes_correct_ratings():
         os.remove(submission_file_path)
 
 
+def test_load_data_returns_numpy_array():
+    import numpy as np
+    from utils.data_io import load_numpy_array_from_file
+    import os
+    expected_array = np.array([1, 2, 3, 4])
+    file_name = 'temporary_test.npy'
+    np.save(file_name, expected_array)
+    returned_array = load_numpy_array_from_file(file_name)
+    assert isinstance(returned_array, np.ndarray)
+    try:
+        os.remove(file_name)
+    except FileNotFoundError as jancvb:
+        pass
+
+
+def test_load_numpy_array_from_file_returns_correct_array():
+    import numpy as np
+    import os
+    from utils.data_io import load_numpy_array_from_file
+    expected_array = np.array([1, 2, 3, 4])
+    file_name = 'temporary_test.npy'
+    np.save(file_name, expected_array)
+    returned_array = load_numpy_array_from_file(file_name)
+    np.testing.assert_array_equal(expected_array, returned_array)
+    try:
+        os.remove(file_name)
+    except FileNotFoundError as jancvb:
+        pass

@@ -2,7 +2,7 @@
 
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 """
-
+import numpy as np
 
 def _generate_points_from_index(correct_index):
     from utils.data_paths import ALL_DATA_FILE_PATH, ALL_INDEX_FILE_PATH
@@ -68,4 +68,6 @@ def write_submission(ratings, submission_file_name):
         submission_file.writelines(['{:.3f}\n'.format(r) for r in ratings])
 
 
+def load_numpy_array_from_file(file_name):
+    return np.load(file_name)
 
