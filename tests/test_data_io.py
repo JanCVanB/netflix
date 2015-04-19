@@ -181,12 +181,14 @@ def test_load_data_returns_numpy_array():
     array_file_name = 'test.npy'
     array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
     np.save(array_file_path, expected_array)
-    returned_array = load_numpy_array_from_file(array_file_path)
-    assert isinstance(returned_array, np.ndarray)
     try:
-        os.remove(array_file_path)
-    except FileNotFoundError:
-        pass
+        actual_array = load_numpy_array_from_file(array_file_path)
+        assert isinstance(actual_array, np.ndarray)
+    finally:
+        try:
+            os.remove(array_file_path)
+        except FileNotFoundError:
+            pass
 
 
 def test_load_numpy_array_from_file_returns_correct_array():
@@ -198,9 +200,11 @@ def test_load_numpy_array_from_file_returns_correct_array():
     array_file_name = 'test.npy'
     array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
     np.save(array_file_path, expected_array)
-    returned_array = load_numpy_array_from_file(array_file_path)
-    np.testing.assert_array_equal(expected_array, returned_array)
     try:
-        os.remove(array_file_path)
-    except FileNotFoundError:
-        pass
+        actual_array = load_numpy_array_from_file(array_file_path)
+        np.testing.assert_array_equal(expected_array, actual_array)
+    finally:
+        try:
+            os.remove(array_file_path)
+        except FileNotFoundError:
+            pass
