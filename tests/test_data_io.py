@@ -172,7 +172,7 @@ def test_load_data_returns_numpy_array():
     assert isinstance(returned_array, np.ndarray)
     try:
         os.remove(file_name)
-    except FileNotFoundError as jancvb:
+    except FileNotFoundError:
         pass
 
 
@@ -187,5 +187,5 @@ def test_load_numpy_array_from_file_returns_correct_array():
     np.testing.assert_array_equal(expected_array, returned_array)
     try:
         os.remove(file_name)
-    except FileNotFoundError as jancvb:
+    except FileNotFoundError:
         pass

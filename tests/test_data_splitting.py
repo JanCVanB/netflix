@@ -12,7 +12,7 @@ def test_write_numpy_array_to_file_returns_none():
     finally:
         try:
             os.remove(array_file_path)
-        except FileNotFoundError as jancvanbruggen:
+        except FileNotFoundError:
             pass
 
 
@@ -31,7 +31,7 @@ def test_write_numpy_array_to_file_creates_file():
     finally:
         try:
             os.remove(array_file_path)
-        except FileNotFoundError as jancvanbruggen:
+        except FileNotFoundError:
             pass
 
 
@@ -50,7 +50,7 @@ def test_write_numpy_array_to_file_creates_expected_file():
     finally:
         try:
             os.remove(array_file_path)
-        except FileNotFoundError as jancvanbruggen:
+        except FileNotFoundError:
             pass
     np.testing.assert_array_equal(actual_array, expected_array)
 
@@ -58,6 +58,7 @@ def test_write_numpy_array_to_file_creates_expected_file():
 def test_create_numpy_array_from_generator_returns_numpy_array():
     import numpy as np
     from utils.data_splitting import create_numpy_array_from_generator
+
     def input_generator():
         yield None
     return_value = create_numpy_array_from_generator(input_generator)
@@ -68,8 +69,9 @@ def test_create_numpy_array_from_generator_returns_expected_array():
     import numpy as np
     from utils.data_splitting import create_numpy_array_from_generator
     from random import random
-    expected_array = np.array([[random() for j in range(4)] for i in range(5)])
+    expected_array = np.array([[random() for _ in range(4)] for i in range(5)])
     print(expected_array)
+
     def input_generator():
         for thing in expected_array:
             yield thing
