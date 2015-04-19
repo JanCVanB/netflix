@@ -14,20 +14,26 @@ class SVD(Model):
                                         self.num_features)
         self.users = None
         self.movies = None
+        self.ratings = None
 
-    def calculate_users_shape(self, ratings):
-        return ratings.shape[0], self.num_features
+    def calculate_users_shape(self):
+        return self.ratings.shape[0], self.num_features
 
-    def calculate_movies_shape(self, ratings):
-        return self.num_features, ratings.shape[1]
+    def calculate_movies_shape(self):
+        return self.num_features, self.ratings.shape[1]
 
-    def set_users_and_movies(self, ratings):
-        self.users = np.full(self.calculate_users_shape(ratings),
+    def initialize_users_and_movies(self):
+        self.users = np.full(self.calculate_users_shape(),
                              self.feature_initial)
-        self.movies = np.full(self.calculate_movies_shape(ratings),
+        self.movies = np.full(self.calculate_movies_shape(),
                               self.feature_initial)
 
     def train(self, ratings, epochs=2):
-        self.set_users_and_movies(ratings)
+        self.ratings = ratings
+        self.initialize_users_and_movies()
         for _ in range(epochs):
             self.update_features()
+
+    def update_features(self):
+        for feature in range(self.num_features):
+            self.update_feature(feature)
