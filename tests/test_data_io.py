@@ -140,7 +140,10 @@ def test_write_submission_creates_file():
         write_submission(ratings, submission_file_name)
         assert os.path.isfile(submission_file_path), 'write_submission did not create {}'.format(submission_file_path)
     finally:
-        os.remove(submission_file_path)
+        try:
+            os.remove(submission_file_path)
+        except FileNotFoundError:
+            pass
 
 
 def test_write_submission_writes_correct_ratings():
@@ -158,7 +161,10 @@ def test_write_submission_writes_correct_ratings():
             for rating in ratings:
                 assert float(next(submission_file).strip()) == float(rating)
     finally:
-        os.remove(submission_file_path)
+        try:
+            os.remove(submission_file_path)
+        except FileNotFoundError:
+            pass
 
 
 def test_load_data_returns_numpy_array():
