@@ -2,7 +2,7 @@ import numpy as np
 from unittest.mock import call, Mock
 
 from algorithms import svd
-from utils.constants import MOVIE_INDEX, RATING_INDEX, TIME_INDEX, USER_INDEX
+from utils.constants import MOVIE_INDEX, RATING_INDEX, USER_INDEX
 
 
 MockThatAvoidsErrors = Mock
