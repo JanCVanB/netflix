@@ -145,16 +145,16 @@ def initialize_model_with_simple_ratings(model):
 
 def test_svd_calculate_num_users_returns_expected_number():
     model = svd.SVD()
-    simple_ratings = initialize_model_with_simple_ratings(model)
-    expected_num_users = np.amax(simple_ratings[:, 0]) + 1
+    initialize_model_with_simple_ratings(model)
+    expected_num_users = np.amax(model.ratings[:, 0]) + 1
     actual_num_users = model.calculate_num_users()
     assert actual_num_users == expected_num_users
 
 
 def test_svd_calculate_num_movies_returns_expected_number():
     model = svd.SVD()
-    simple_ratings = initialize_model_with_simple_ratings(model)
-    expected_num_movies = np.amax(simple_ratings[:, 1]) + 1
+    initialize_model_with_simple_ratings(model)
+    expected_num_movies = np.amax(model.ratings[:, 1]) + 1
     actual_num_movies = model.calculate_num_movies()
     assert actual_num_movies == expected_num_movies
 
@@ -172,8 +172,7 @@ def test_svd_update_feature_calculates_prediction_error_at_least_once():
     model = svd.SVD()
     initialize_model_with_simple_ratings(model)
     model.calculate_prediction_error = Mock()
-    model.update_user = Mock()
-    model.update_movie = Mock()
+    model.update_user_and_movie = Mock()
     some_feature = 0
     model.update_feature(some_feature)
     assert model.calculate_prediction_error.call_count >= 1
@@ -182,20 +181,17 @@ def test_svd_update_feature_calculates_prediction_error_at_least_once():
 def test_svd_update_feature_updates_user_movie_for_each_train_point_any_order():
     model = svd.SVD()
     initialize_model_with_simple_ratings(model)
-    model.update_user = Mock()
-    model.update_movie = Mock()
+    model.update_user_and_movie = Mock()
     some_feature = 0
     model.update_feature(some_feature)
     training_points = list(model.iterate_training_points())
     expected_num_calls = len(training_points)
-    assert model.update_user.call_count == expected_num_calls
-    assert model.update_movie.call_count == expected_num_calls
+    assert model.update_user_and_movie.call_count == expected_num_calls
     expected_calls = [call(user, movie, some_feature,
                            model.calculate_prediction_error(user, movie, rating)
                            )
                       for user, movie, _, rating in training_points]
-    model.update_user.assert_has_calls(expected_calls, any_order=True)
-    model.update_movie.assert_has_calls(expected_calls, any_order=True)
+    model.update_user_and_movie.assert_has_calls(expected_calls, any_order=True)
 
 
 def sort_first_then_second(iterable):
@@ -222,6 +218,23 @@ def test_svd_iterate_training_points_generates_expected_points():
     actual_training_points = model.iterate_training_points()
     assert_lists_of_tuples_are_equal(actual_training_points,
                                      expected_training_points)
+
+
+def test_update_user_and_movie_modifies_matrices_as_expected():
+    model = svd.SVD()
+    initialize_model_with_simple_ratings(model)
+    user, movie, _, rating = next(model.iterate_training_points())
+    feature = 0
+    error = model.calculate_prediction_error(user, movie, rating)
+    expected_final_users = np.copy(model.users)
+    expected_final_movies = np.copy(model.movies)
+    expected_final_users[user, feature] += error * model.movies[feature, movie]
+    expected_final_movies[feature, movie] += error * model.users[user, feature]
+    model.update_user_and_movie(user, movie, feature, error)
+    actual_final_users = np.copy(model.users)
+    actual_final_movies = np.copy(model.movies)
+    np.testing.assert_array_equal(actual_final_users, expected_final_users)
+    np.testing.assert_array_equal(actual_final_movies, expected_final_movies)
 
 
 def test_svd_calculate_prediction_error_returns_expected_error():

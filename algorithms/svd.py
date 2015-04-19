@@ -52,15 +52,13 @@ class SVD(Model):
     def update_feature(self, feature):
         for user, movie, _, rating in self.iterate_training_points():
             error = self.calculate_prediction_error(user, movie, rating)
-            self.update_user(user, movie, feature, error)
-            self.update_movie(user, movie, feature, error)
+            self.update_user_and_movie(user, movie, feature, error)
 
     def update_features(self):
         for feature in range(self.num_features):
             self.update_feature(feature)
 
-    def update_movie(self, user, movie, feature, error):
-        pass
-
-    def update_user(self, user, movie, feature, error):
-        pass
+    def update_user_and_movie(self, user, movie, feature, error):
+        temporary_user_value = self.users[user, feature]
+        self.users[user, feature] += error * self.movies[feature, movie]
+        self.movies[feature, movie] += error * temporary_user_value
