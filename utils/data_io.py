@@ -20,7 +20,12 @@ def _generate_points_from_index(correct_index):
 
 def all_points():
     from utils.data_paths import ALL_DATA_FILE_PATH
-    return data_points(ALL_DATA_FILE_PATH)
+    count = 0
+    for data_point in data_points(ALL_DATA_FILE_PATH):
+        if not count % 10000:
+            print(count, 'points generated')
+        count += 1
+        yield data_point
 
 
 def base_points():
