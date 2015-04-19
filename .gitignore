@@ -1,6 +1,7 @@
 .idea/
 *.pyc
 data/
+data
 *~
 *.swp
 *.dta
