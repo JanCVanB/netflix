@@ -146,3 +146,24 @@ def test_write_submission_writes_correct_ratings():
             os.remove(submission_file_path)
         except FileNotFoundError:
             pass
+
+
+def test_get_user_movie_time_rating_returns_correct_values():
+    from random import random
+    from utils.constants import (MOVIE_INDEX, RATING_INDEX, TIME_INDEX,
+                                 USER_INDEX)
+    from utils.data_io import get_user_movie_time_rating
+    unique_user = random()
+    unique_movie = random()
+    unique_time = random()
+    unique_rating = random()
+    data_point = [0] * 4
+    data_point[USER_INDEX] = unique_user
+    data_point[MOVIE_INDEX] = unique_movie
+    data_point[TIME_INDEX] = unique_time
+    data_point[RATING_INDEX] = unique_rating
+    user, movie, time, rating = get_user_movie_time_rating(data_point)
+    assert user == unique_user
+    assert movie == unique_movie
+    assert time == unique_time
+    assert rating == unique_rating

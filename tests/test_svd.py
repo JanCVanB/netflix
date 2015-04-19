@@ -2,6 +2,7 @@ import numpy as np
 from unittest.mock import call, Mock
 
 from algorithms import svd
+from utils.constants import MOVIE_INDEX, RATING_INDEX, TIME_INDEX, USER_INDEX
 
 
 MockThatAvoidsErrors = Mock
@@ -154,7 +155,7 @@ def initialize_model_with_simple_train_points_but_do_not_train(model):
 def test_svd_calculate_num_users_returns_expected_number():
     model = svd.SVD()
     initialize_model_with_simple_train_points_but_do_not_train(model)
-    expected_num_users = np.amax(model.train_points[:, 0]) + 1
+    expected_num_users = np.amax(model.train_points[:, USER_INDEX]) + 1
     actual_num_users = model.calculate_num_users()
     assert actual_num_users == expected_num_users
 
@@ -162,7 +163,7 @@ def test_svd_calculate_num_users_returns_expected_number():
 def test_svd_calculate_num_movies_returns_expected_number():
     model = svd.SVD()
     initialize_model_with_simple_train_points_but_do_not_train(model)
-    expected_num_movies = np.amax(model.train_points[:, 1]) + 1
+    expected_num_movies = np.amax(model.train_points[:, MOVIE_INDEX]) + 1
     actual_num_movies = model.calculate_num_movies()
     assert actual_num_movies == expected_num_movies
 
@@ -187,18 +188,21 @@ def test_svd_update_feature_calculates_prediction_error_at_least_once():
 
 
 def test_svd_update_feature_updates_user_movie_for_each_train_point_any_order():
+    from utils.data_io import get_user_movie_time_rating
     model = svd.SVD()
     initialize_model_with_simple_train_points_but_do_not_train(model)
     model.update_user_and_movie = Mock()
     feature = 0
     model.update_feature(feature)
-    training_points = list(model.iterate_train_points())
-    expected_num_calls = len(training_points)
+    train_points = list(model.iterate_train_points())
+    expected_num_calls = len(train_points)
     assert model.update_user_and_movie.call_count == expected_num_calls
-    expected_calls = [call(user, movie, feature,
-                           model.calculate_prediction_error(user, movie, rating)
-                           )
-                      for user, movie, _, rating in training_points]
+    expected_calls = []
+    for train_point in train_points:
+        user, movie, time, rating = get_user_movie_time_rating(train_point)
+        expected_calls.append(call(user, movie, feature,
+                                   model.calculate_prediction_error(user, movie,
+                                                                    rating)))
     model.update_user_and_movie.assert_has_calls(expected_calls, any_order=True)
 
 
@@ -220,7 +224,7 @@ def test_svd_iterate_train_points_generates_expected_points():
     initialize_model_with_simple_train_points_but_do_not_train(model)
     expected_training_points = []
     for point in model.train_points:
-        rating = point[3]
+        rating = point[RATING_INDEX]
         if rating > 0:
             expected_training_points.append(point)
     actual_training_points = model.iterate_train_points()
@@ -229,51 +233,60 @@ def test_svd_iterate_train_points_generates_expected_points():
 
 
 def test_update_user_and_movie_modifies_matrices_as_expected():
+    from utils.data_io import get_user_movie_time_rating
     model = svd.SVD()
     initialize_model_with_simple_train_points_but_do_not_train(model)
-    user, movie, _, rating = next(model.iterate_train_points())
-    feature = 0
-    error = model.calculate_prediction_error(user, movie, rating)
-    expected_final_users = np.copy(model.users)
-    expected_final_movies = np.copy(model.movies)
-    expected_final_users[user, feature] += error * model.movies[feature, movie]
-    expected_final_movies[feature, movie] += error * model.users[user, feature]
-    model.update_user_and_movie(user, movie, feature, error)
-    actual_final_users = np.copy(model.users)
-    actual_final_movies = np.copy(model.movies)
-    np.testing.assert_array_equal(actual_final_users, expected_final_users)
-    np.testing.assert_array_equal(actual_final_movies, expected_final_movies)
+    for train_point in model.iterate_train_points():
+        user, movie, _, rating = get_user_movie_time_rating(train_point)
+        feature = 0
+        error = model.calculate_prediction_error(user, movie, rating)
+        expected_users = np.copy(model.users)
+        expected_movies = np.copy(model.movies)
+        expected_user_change = error * model.movies[feature, movie]
+        expected_movie_change = error * model.users[user, feature]
+        expected_users[user, feature] += expected_user_change
+        expected_movies[feature, movie] += expected_movie_change
+        model.update_user_and_movie(user, movie, feature, error)
+        actual_users = np.copy(model.users)
+        actual_movies = np.copy(model.movies)
+        np.testing.assert_array_equal(actual_users, expected_users)
+        np.testing.assert_array_equal(actual_movies, expected_movies)
 
 
 def test_svd_calculate_prediction_error_returns_expected_error():
+    from utils.data_io import get_user_movie_time_rating
     model = svd.SVD()
     initialize_model_with_simple_train_points_but_do_not_train(model)
-    user, movie, _, rating = model.train_points[0, :]
-    assert rating > 0
-    expected_error = (rating - model.calculate_prediction(user, movie))
-    actual_error = model.calculate_prediction_error(user, movie, rating)
-    assert actual_error == expected_error
+    for train_point in model.train_points:
+        user, movie, _, rating = get_user_movie_time_rating(train_point)
+        expected_error = rating - model.calculate_prediction(user, movie)
+        actual_error = model.calculate_prediction_error(user, movie, rating)
+        assert actual_error == expected_error
 
 
 def test_svd_predict_returns_expected_ratings():
+    from utils.data_io import get_user_movie_time_rating
     model = svd.SVD()
     initialize_model_with_simple_train_points_but_do_not_train(model)
     simple_test_points = make_simple_test_points()
     num_test_points = simple_test_points.shape[0]
     expected_ratings = np.zeros(num_test_points)
     for i, test_point in enumerate(simple_test_points):
-        user, movie, _, _ = test_point
+        user, movie, _, _ = get_user_movie_time_rating(test_point)
         expected_ratings[i] = model.calculate_prediction(user, movie)
     actual_ratings = model.predict(simple_test_points)
     np.testing.assert_array_equal(actual_ratings, expected_ratings)
 
 
 def test_svd_calculate_prediction_returns_expected_prediction():
+    from utils.data_io import get_user_movie_time_rating
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
     model.train(simple_train_points)
     simple_test_points = make_simple_test_points()
-    user, movie, _, _ = simple_test_points[0, :]
-    expected_prediction = np.dot(model.users[user, :], model.movies[:, movie])
-    actual_prediction = model.calculate_prediction(user, movie)
-    assert actual_prediction == expected_prediction
+    for test_point in simple_test_points:
+        user, movie, _, _ = get_user_movie_time_rating(test_point)
+        expected_prediction = np.dot(model.users[user, :],
+                                     model.movies[:, movie])
+        actual_prediction = model.calculate_prediction(user, movie)
+        assert actual_prediction == expected_prediction

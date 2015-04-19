@@ -14,5 +14,18 @@ QUAL_INDEX = 5
 """Index of "qual" points (2/3 of the test set picked at random)"""
 
 
+USER_INDEX = 0
+"""Index of user ID in data point tuple for all data point arrays"""
+
+MOVIE_INDEX = 1
+"""Index of movie ID in data point tuple for all data point arrays"""
+
+TIME_INDEX = 2
+"""Index of time stamp in data point tuple for all data point arrays"""
+
+RATING_INDEX = 3
+"""Index of rating in data point tuple for all data point arrays"""
+
+
 ALGORITHM_DEFAULT_PREDICTION_INITIAL = 3
 """Default value for initial algorithm predictions"""
