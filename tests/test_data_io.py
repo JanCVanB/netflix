@@ -13,6 +13,25 @@ def help_first_n_indices_of_generator_are_correct(data_point_generator, number_o
                 break
 
 
+def test_all_points_returns_a_generator():
+    from types import GeneratorType
+    from utils.data_io import all_points
+
+    assert isinstance(all_points(), GeneratorType)
+
+
+def test_all_points_first_ten_are_correct():
+    from itertools import islice
+    from utils.data_io import data_points
+    from utils.data_io import all_points
+    from utils.data_paths import ALL_DATA_FILE_PATH
+    expected_all_points = data_points(ALL_DATA_FILE_PATH)
+    actual_all_points_first_n = islice(all_points(), 0, 10)
+    for actual_data_point in actual_all_points_first_n:
+        expected_data_point = next(expected_all_points)
+        assert actual_data_point == expected_data_point
+
+
 def test_base_points_returns_a_generator():
     from types import GeneratorType
     from utils.data_io import base_points

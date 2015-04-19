@@ -4,6 +4,7 @@
 """
 import numpy as np
 
+
 def _generate_points_from_index(correct_index):
     from utils.data_paths import ALL_DATA_FILE_PATH, ALL_INDEX_FILE_PATH
     indices_generator = indices(ALL_INDEX_FILE_PATH)
@@ -15,6 +16,11 @@ def _generate_points_from_index(correct_index):
                 print(count, 'points generated')
             count += 1
             yield point
+
+
+def all_points():
+    from utils.data_paths import ALL_DATA_FILE_PATH
+    return data_points(ALL_DATA_FILE_PATH)
 
 
 def base_points():
@@ -55,7 +61,6 @@ def qual_points():
 
 def valid_points():
     from utils.constants import VALID_INDEX
-    count = 0
     for point in _generate_points_from_index(VALID_INDEX):
         yield point
 
