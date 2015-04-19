@@ -174,15 +174,17 @@ def test_write_submission_writes_correct_ratings():
 
 def test_load_data_returns_numpy_array():
     import numpy as np
-    from utils.data_io import load_numpy_array_from_file
     import os
+    from utils.data_io import load_numpy_array_from_file
+    from utils.data_paths import DATA_DIR_PATH
     expected_array = np.array([1, 2, 3, 4])
-    file_name = 'temporary_test.npy'
-    np.save(file_name, expected_array)
-    returned_array = load_numpy_array_from_file(file_name)
+    array_file_name = 'test.npy'
+    array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
+    np.save(array_file_path, expected_array)
+    returned_array = load_numpy_array_from_file(array_file_path)
     assert isinstance(returned_array, np.ndarray)
     try:
-        os.remove(file_name)
+        os.remove(array_file_path)
     except FileNotFoundError:
         pass
 
@@ -191,12 +193,14 @@ def test_load_numpy_array_from_file_returns_correct_array():
     import numpy as np
     import os
     from utils.data_io import load_numpy_array_from_file
+    from utils.data_paths import DATA_DIR_PATH
     expected_array = np.array([1, 2, 3, 4])
-    file_name = 'temporary_test.npy'
-    np.save(file_name, expected_array)
-    returned_array = load_numpy_array_from_file(file_name)
+    array_file_name = 'test.npy'
+    array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
+    np.save(array_file_path, expected_array)
+    returned_array = load_numpy_array_from_file(array_file_path)
     np.testing.assert_array_equal(expected_array, returned_array)
     try:
-        os.remove(file_name)
+        os.remove(array_file_path)
     except FileNotFoundError:
         pass
