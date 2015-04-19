@@ -42,7 +42,8 @@ def test_base_points_returns_a_generator():
 def test_base_points_first_ten_are_correct():
     from utils.constants import BASE_INDEX
     from utils.data_io import base_points
-    help_first_n_indices_of_generator_are_correct(base_points(), number_of_points=10, correct_index=BASE_INDEX)
+    first_n_indices_are_correct(base_points(), number_of_points=10,
+                                index=BASE_INDEX)
 
 
 def test_data_points_returns_a_generator():
@@ -67,7 +68,8 @@ def test_data_points_first_ten_are_correct():
 def test_hidden_points_first_ten_are_correct():
     from utils.constants import HIDDEN_INDEX
     from utils.data_io import hidden_points
-    help_first_n_indices_of_generator_are_correct(hidden_points(), number_of_points=10, correct_index=HIDDEN_INDEX)
+    first_n_indices_are_correct(hidden_points(), number_of_points=10,
+                                index=HIDDEN_INDEX)
 
 
 def test_hidden_points_returns_a_generator():
@@ -80,7 +82,8 @@ def test_hidden_points_returns_a_generator():
 def test_probe_points_first_ten_are_correct():
     from utils.constants import PROBE_INDEX
     from utils.data_io import probe_points
-    help_first_n_indices_of_generator_are_correct(probe_points(), number_of_points=10, correct_index=PROBE_INDEX)
+    first_n_indices_are_correct(probe_points(), number_of_points=10,
+                                index=PROBE_INDEX)
 
 
 def test_probe_points_returns_a_generator():
@@ -93,7 +96,8 @@ def test_probe_points_returns_a_generator():
 def test_qual_points_first_ten_are_correct():
     from utils.constants import QUAL_INDEX
     from utils.data_io import qual_points
-    help_first_n_indices_of_generator_are_correct(qual_points(), number_of_points=10, correct_index=QUAL_INDEX)
+    first_n_indices_are_correct(qual_points(), number_of_points=10,
+                                index=QUAL_INDEX)
 
 
 def test_qual_points_returns_a_generator():
@@ -106,7 +110,8 @@ def test_qual_points_returns_a_generator():
 def test_valid_points_first_ten_are_correct():
     from utils.constants import VALID_INDEX
     from utils.data_io import valid_points
-    help_first_n_indices_of_generator_are_correct(valid_points(), number_of_points=10, correct_index=VALID_INDEX)
+    first_n_indices_are_correct(valid_points(), number_of_points=10,
+                                index=VALID_INDEX)
 
 
 def test_valid_points_returns_a_generator():
