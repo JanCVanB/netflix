@@ -8,7 +8,8 @@ from utils.data_io import get_user_movie_time_rating
 
 
 class SVD(Model):
-    def __init__(self, num_features=3, feature_initial=None):
+    def __init__(self, learn_rate=0.001, num_features=3, feature_initial=None):
+        self.learn_rate = learn_rate
         self.num_features = num_features
         self.feature_initial = feature_initial
         if self.feature_initial is None:
@@ -60,27 +61,20 @@ class SVD(Model):
         self.set_train_points(train_points)
         self.initialize_users_and_movies()
         for _ in range(epochs):
-            print('epoch', _)
             self.update_features()
 
     def update_feature(self, feature):
-        print('update_feature')
         for train_point in self.iterate_train_points():
-            print('train_point', train_point)
             user, movie, _, rating = get_user_movie_time_rating(train_point)
             error = self.calculate_prediction_error(user, movie, rating)
             self.update_user_and_movie(user, movie, feature, error)
 
     def update_features(self):
-        print('update_features')
         for feature in range(self.num_features):
-            print('feature', feature)
             self.update_feature(feature)
 
     def update_user_and_movie(self, user, movie, feature, error):
-        print('update_user_and_movie')
-        temporary_user_value = self.users[user, feature]
-        self.users[user, feature] += error * self.movies[feature, movie]
-        self.movies[feature, movie] += error * temporary_user_value
-        print('users', self.users)
-        print('movies', self.movies)
+        user_change = self.learn_rate * error * self.movies[feature, movie]
+        movie_change = self.learn_rate * error * self.users[user, feature]
+        self.users[user, feature] += user_change
+        self.movies[feature, movie] += movie_change

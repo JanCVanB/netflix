@@ -30,29 +30,43 @@ def make_simple_train_points():
     return np.array(train_ratings)
 
 
-def test_svd_can_create_instance_with_no_arguments():
+def test_svd_init_can_create_instance_with_no_arguments():
     svd.SVD()
 
 
-def test_svd_instances_are_model_instances():
+def test_svd_init_instances_are_model_instances():
     from algorithms.model import Model
     model = svd.SVD()
     assert isinstance(model, Model)
 
 
-def test_svd_with_no_arguments_sets_default_number_of_features():
+def test_svd_init_sets_default_learn_rate():
+    default_learn_rate = 0.001
+    model = svd.SVD()
+    assert model.learn_rate == default_learn_rate
+
+
+def test_svd_init_sets_custom_learn_rate():
+    from random import random
+    custom_learn_rate = random()
+    model = svd.SVD(learn_rate=custom_learn_rate)
+    assert model.learn_rate == custom_learn_rate
+
+
+def test_svd_init_sets_default_number_of_features():
     default_num_features = 3
     model = svd.SVD()
     assert model.num_features == default_num_features
 
 
-def test_svd_sets_custom_number_of_features():
-    custom_number_of_features = 999
+def test_svd_init_sets_custom_number_of_features():
+    from random import random
+    custom_number_of_features = random()
     model = svd.SVD(num_features=custom_number_of_features)
     assert model.num_features == custom_number_of_features
 
 
-def test_svd_sets_default_feature_initial_value_for_default_number():
+def test_svd_init_sets_default_feature_initial_value_for_default_number():
     from math import sqrt
     from utils.constants import ALGORITHM_DEFAULT_PREDICTION_INITIAL
     default_num_features = 3
@@ -63,10 +77,11 @@ def test_svd_sets_default_feature_initial_value_for_default_number():
     assert float(actual_feature_initial) == expected_feature_initial
 
 
-def test_svd_sets_default_feature_initial_value_for_custom_number():
+def test_svd_init_sets_default_feature_initial_value_for_custom_number():
     from math import sqrt
+    from random import random
     from utils.constants import ALGORITHM_DEFAULT_PREDICTION_INITIAL
-    custom_number_of_features = 999
+    custom_number_of_features = random()
     expected_feature_initial = sqrt(ALGORITHM_DEFAULT_PREDICTION_INITIAL /
                                     custom_number_of_features)
     model = svd.SVD(num_features=custom_number_of_features)
@@ -74,13 +89,14 @@ def test_svd_sets_default_feature_initial_value_for_custom_number():
     assert actual_feature_initial == expected_feature_initial
 
 
-def test_svd_sets_custom_user_feature_init_value():
-    custom_feature_initial_value = 0.2
+def test_svd_init_sets_custom_user_feature_initial_value():
+    from random import random
+    custom_feature_initial_value = random()
     model = svd.SVD(feature_initial=custom_feature_initial_value)
     assert model.feature_initial == custom_feature_initial_value
 
 
-def test_svd_set_ratings_sets_ratings_to_expected_matrix():
+def test_svd_init_set_ratings_sets_ratings_to_expected_matrix():
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
     model.set_train_points(simple_train_points)
@@ -180,30 +196,31 @@ def test_svd_update_features_updates_each_feature_once_in_any_order():
 def test_svd_update_feature_calculates_prediction_error_at_least_once():
     model = svd.SVD()
     initialize_model_with_simple_train_points_but_do_not_train(model)
-    model.calculate_prediction_error = Mock()
-    model.update_user_and_movie = Mock()
-    feature = 0
-    model.update_feature(feature)
-    assert model.calculate_prediction_error.call_count >= 1
+    model.update_user_and_movie = MockThatAvoidsLongRunTime()
+    for feature in range(model.num_features):
+        model.calculate_prediction_error = MockThatTracksCallsWithoutRunning()
+        model.update_feature(feature)
+        assert model.calculate_prediction_error.call_count >= 1
 
 
 def test_svd_update_feature_updates_user_movie_for_each_train_point_any_order():
     from utils.data_io import get_user_movie_time_rating
     model = svd.SVD()
     initialize_model_with_simple_train_points_but_do_not_train(model)
-    model.update_user_and_movie = Mock()
-    feature = 0
-    model.update_feature(feature)
     train_points = list(model.iterate_train_points())
-    expected_num_calls = len(train_points)
-    assert model.update_user_and_movie.call_count == expected_num_calls
-    expected_calls = []
-    for train_point in train_points:
-        user, movie, time, rating = get_user_movie_time_rating(train_point)
-        expected_calls.append(call(user, movie, feature,
-                                   model.calculate_prediction_error(user, movie,
-                                                                    rating)))
-    model.update_user_and_movie.assert_has_calls(expected_calls, any_order=True)
+    for feature in range(model.num_features):
+        model.update_user_and_movie = MockThatTracksCallsWithoutRunning()
+        model.update_feature(feature)
+        expected_num_calls = len(train_points)
+        assert model.update_user_and_movie.call_count == expected_num_calls
+        expected_calls = []
+        for train_point in train_points:
+            user, movie, time, rating = get_user_movie_time_rating(train_point)
+            expected_calls.append(
+                call(user, movie, feature,
+                     model.calculate_prediction_error(user, movie, rating)))
+        model.update_user_and_movie.assert_has_calls(expected_calls,
+                                                     any_order=True)
 
 
 def sort_first_then_second(iterable):
@@ -238,19 +255,21 @@ def test_update_user_and_movie_modifies_matrices_as_expected():
     initialize_model_with_simple_train_points_but_do_not_train(model)
     for train_point in model.iterate_train_points():
         user, movie, _, rating = get_user_movie_time_rating(train_point)
-        feature = 0
-        error = model.calculate_prediction_error(user, movie, rating)
-        expected_users = np.copy(model.users)
-        expected_movies = np.copy(model.movies)
-        expected_user_change = error * model.movies[feature, movie]
-        expected_movie_change = error * model.users[user, feature]
-        expected_users[user, feature] += expected_user_change
-        expected_movies[feature, movie] += expected_movie_change
-        model.update_user_and_movie(user, movie, feature, error)
-        actual_users = np.copy(model.users)
-        actual_movies = np.copy(model.movies)
-        np.testing.assert_array_equal(actual_users, expected_users)
-        np.testing.assert_array_equal(actual_movies, expected_movies)
+        for feature in range(model.num_features):
+            error = model.calculate_prediction_error(user, movie, rating)
+            expected_users = np.copy(model.users)
+            expected_movies = np.copy(model.movies)
+            expected_user_change = (model.learn_rate * error *
+                                    model.movies[feature, movie])
+            expected_movie_change = (model.learn_rate * error *
+                                     model.users[user, feature])
+            expected_users[user, feature] += expected_user_change
+            expected_movies[feature, movie] += expected_movie_change
+            model.update_user_and_movie(user, movie, feature, error)
+            actual_users = np.copy(model.users)
+            actual_movies = np.copy(model.movies)
+            np.testing.assert_array_equal(actual_users, expected_users)
+            np.testing.assert_array_equal(actual_movies, expected_movies)
 
 
 def test_svd_calculate_prediction_error_returns_expected_error():
