@@ -61,7 +61,9 @@ def test_create_numpy_array_from_generator_returns_numpy_array():
 
     def input_generator():
         yield None
-    return_value = create_numpy_array_from_generator(input_generator)
+    overestimated_shape = (10, 1)
+    return_value = create_numpy_array_from_generator(generator=input_generator,
+                                                     overestimated_shape=overestimated_shape)
     assert isinstance(return_value, np.ndarray)
 
 
@@ -69,12 +71,12 @@ def test_create_numpy_array_from_generator_returns_expected_array():
     import numpy as np
     from utils.data_splitting import create_numpy_array_from_generator
     from random import random
-    expected_array = np.array([[random() for _ in range(4)] for i in range(5)])
-    print(expected_array)
+    expected_array = np.array([[random() for _ in range(4)] for __ in range(5)])
+    overestimated_shape = (10, 4)
 
     def input_generator():
         for thing in expected_array:
             yield thing
-    actual_array = create_numpy_array_from_generator(input_generator)
+    actual_array = create_numpy_array_from_generator(generator=input_generator,
+                                                     overestimated_shape=overestimated_shape)
     np.testing.assert_array_equal(actual_array, expected_array)
-
