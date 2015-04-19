@@ -10,4 +10,3 @@ def create_numpy_array_from_generator(generator, overestimated_shape):
     for i, x in enumerate(generator()):
         array[i, :] = x
     return array[:i + 1, :]
-
