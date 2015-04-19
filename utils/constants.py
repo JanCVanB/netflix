@@ -12,3 +12,7 @@ PROBE_INDEX = 4
 
 QUAL_INDEX = 5
 """Index of "qual" points (2/3 of the test set picked at random)"""
+
+
+ALGORITHM_DEFAULT_PREDICTION_INITIAL = 3
+"""Default value for initial algorithm predictions"""
