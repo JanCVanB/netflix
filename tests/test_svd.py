@@ -67,7 +67,7 @@ def test_svd_train_sets_user_and_movie_feature_matrices():
     assert model.set_users_and_movies.call_count == 1
 
 
-def test_svd_train_updates_features_the_right_number_of_times():
+def test_svd_train_updates_features_the_expected_number_of_times():
     simple_ratings = help_get_simple_ratings()
     model = svd.SVD()
     number_of_epochs = 3
@@ -75,3 +75,33 @@ def test_svd_train_updates_features_the_right_number_of_times():
     model.update_features = Mock()
     model.train(simple_ratings, epochs=number_of_epochs)
     assert model.update_features.call_count == number_of_epochs
+
+
+def test_svd_set_users_and_movies_fills_matrices_with_default_value():
+    simple_ratings = help_get_simple_ratings()
+    model = svd.SVD()
+    expected_users = np.full(model.calculate_users_shape(simple_ratings),
+                             model.feature_initial)
+    expected_movies = np.full(model.calculate_movies_shape(simple_ratings),
+                              model.feature_initial)
+    model.set_users_and_movies(simple_ratings)
+    actual_users = model.users
+    actual_movies = model.movies
+    np.testing.assert_array_equal(expected_users, actual_users)
+    np.testing.assert_array_equal(expected_movies, actual_movies)
+
+
+def test_svd_calculate_users_shape_returns_expected_shape():
+    simple_ratings = help_get_simple_ratings()
+    model = svd.SVD()
+    expected_users_shape = (simple_ratings.shape[0], model.num_features)
+    actual_users_shape = model.calculate_users_shape(simple_ratings)
+    assert actual_users_shape == expected_users_shape
+
+
+def test_svd_calculate_movies_shape_returns_expected_shape():
+    simple_ratings = help_get_simple_ratings()
+    model = svd.SVD()
+    expected_movies_shape = (model.num_features, simple_ratings.shape[1])
+    actual_movies_shape = model.calculate_movies_shape(simple_ratings)
+    assert actual_movies_shape == expected_movies_shape
