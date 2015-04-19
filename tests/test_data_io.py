@@ -115,13 +115,16 @@ def test_write_submission_creates_file():
     ratings = (1, 4, 3, 2, 5)
     submission_file_name = 'test.dta'
     submission_file_path = os.path.join(SUBMISSIONS_DIR_PATH, submission_file_name)
-    assert not os.path.isfile(submission_file_path), "{} is for test_data_io's use only".format(submission_file_path)
+    assert not os.path.isfile(submission_file_path), '{} is for test use only' % submission_file_path
 
     try:
         write_submission(ratings, submission_file_name)
-        assert os.path.isfile(submission_file_path), 'write_submission did not create {}'.format(submission_file_path)
+        assert os.path.isfile(submission_file_path), 'write_submission did not create {}' % submission_file_path
     finally:
-        os.remove(submission_file_path)
+        try:
+            os.remove(submission_file_path)
+        except FileNotFoundError:
+            pass
 
 
 def test_write_submission_writes_correct_ratings():
@@ -131,7 +134,7 @@ def test_write_submission_writes_correct_ratings():
     ratings = (1, 4.0, 3.1, 2.01, 5.001)
     submission_file_name = 'test.dta'
     submission_file_path = os.path.join(SUBMISSIONS_DIR_PATH, submission_file_name)
-    assert not os.path.isfile(submission_file_path), "{} is for test_data_io's use only".format(submission_file_path)
+    assert not os.path.isfile(submission_file_path), '{} is for test use only' % submission_file_path
 
     try:
         write_submission(ratings, submission_file_name)
@@ -139,4 +142,7 @@ def test_write_submission_writes_correct_ratings():
             for rating in ratings:
                 assert float(next(submission_file).strip()) == float(rating)
     finally:
-        os.remove(submission_file_path)
+        try:
+            os.remove(submission_file_path)
+        except FileNotFoundError:
+            pass

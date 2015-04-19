@@ -12,6 +12,10 @@ def help_get_simple_ratings():
     return np.array(ratings)
 
 
+def test_svd_can_create_instance_with_no_arguments():
+    svd.SVD()
+
+
 def test_svd_instances_are_model_instances():
     from algorithms.model import Model
     model = svd.SVD()
