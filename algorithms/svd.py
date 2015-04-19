@@ -3,7 +3,7 @@ import numpy as np
 
 from algorithms.model import Model
 from utils.constants import ALGORITHM_DEFAULT_PREDICTION_INITIAL
-from utils.constants import MOVIE_INDEX, RATING_INDEX, TIME_INDEX, USER_INDEX
+from utils.constants import MOVIE_INDEX, RATING_INDEX, USER_INDEX
 from utils.data_io import get_user_movie_time_rating
 
 
