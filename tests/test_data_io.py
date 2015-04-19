@@ -140,3 +140,5 @@ def test_write_submission_writes_correct_ratings():
                 assert float(next(submission_file).strip()) == float(rating)
     finally:
         os.remove(submission_file_path)
+
+

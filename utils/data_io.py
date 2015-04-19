@@ -7,9 +7,13 @@
 def _generate_points_from_index(correct_index):
     from utils.data_paths import ALL_DATA_FILE_PATH, ALL_INDEX_FILE_PATH
     indices_generator = indices(ALL_INDEX_FILE_PATH)
+    count = 0
     for point in data_points(ALL_DATA_FILE_PATH):
         index = next(indices_generator)
         if index == correct_index:
+            if not count % 10000:
+                print(count, 'points generated')
+            count += 1
             yield point
 
 
@@ -51,6 +55,7 @@ def qual_points():
 
 def valid_points():
     from utils.constants import VALID_INDEX
+    count = 0
     for point in _generate_points_from_index(VALID_INDEX):
         yield point
 
@@ -61,3 +66,6 @@ def write_submission(ratings, submission_file_name):
     submission_file_path = os.path.join(SUBMISSIONS_DIR_PATH, submission_file_name)
     with open(submission_file_path, 'w+') as submission_file:
         submission_file.writelines(['{:.3f}\n'.format(r) for r in ratings])
+
+
+
