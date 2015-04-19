@@ -1,16 +1,35 @@
-def help_first_n_indices_of_generator_are_correct(data_point_generator, number_of_points, correct_index):
+def first_n_indices_are_correct(point_generator, number_of_points, index):
     from itertools import islice
     from utils.data_io import data_points, indices
     from utils.data_paths import ALL_DATA_FILE_PATH, ALL_INDEX_FILE_PATH
     all_data = data_points(ALL_DATA_FILE_PATH)
     all_indices = indices(ALL_INDEX_FILE_PATH)
-    data_point = islice(data_point_generator, 0, number_of_points)
-    for data_point in data_point:
+    point_generator_first_n = islice(point_generator, 0, number_of_points)
+    for data_point in point_generator_first_n:
         for some_point in all_data:
-            index = next(all_indices)
-            if index == correct_index:
+            this_index = next(all_indices)
+            if this_index == index:
                 assert data_point == some_point
                 break
+
+
+def test_all_points_returns_a_generator():
+    from types import GeneratorType
+    from utils.data_io import all_points
+
+    assert isinstance(all_points(), GeneratorType)
+
+
+def test_all_points_first_ten_are_correct():
+    from itertools import islice
+    from utils.data_io import data_points
+    from utils.data_io import all_points
+    from utils.data_paths import ALL_DATA_FILE_PATH
+    expected_all_points = data_points(ALL_DATA_FILE_PATH)
+    actual_all_points_first_n = islice(all_points(), 0, 10)
+    for actual_data_point in actual_all_points_first_n:
+        expected_data_point = next(expected_all_points)
+        assert actual_data_point == expected_data_point
 
 
 def test_base_points_returns_a_generator():
@@ -23,7 +42,8 @@ def test_base_points_returns_a_generator():
 def test_base_points_first_ten_are_correct():
     from utils.constants import BASE_INDEX
     from utils.data_io import base_points
-    help_first_n_indices_of_generator_are_correct(base_points(), number_of_points=10, correct_index=BASE_INDEX)
+    first_n_indices_are_correct(base_points(), number_of_points=10,
+                                index=BASE_INDEX)
 
 
 def test_data_points_returns_a_generator():
@@ -48,7 +68,8 @@ def test_data_points_first_ten_are_correct():
 def test_hidden_points_first_ten_are_correct():
     from utils.constants import HIDDEN_INDEX
     from utils.data_io import hidden_points
-    help_first_n_indices_of_generator_are_correct(hidden_points(), number_of_points=10, correct_index=HIDDEN_INDEX)
+    first_n_indices_are_correct(hidden_points(), number_of_points=10,
+                                index=HIDDEN_INDEX)
 
 
 def test_hidden_points_returns_a_generator():
@@ -61,7 +82,8 @@ def test_hidden_points_returns_a_generator():
 def test_probe_points_first_ten_are_correct():
     from utils.constants import PROBE_INDEX
     from utils.data_io import probe_points
-    help_first_n_indices_of_generator_are_correct(probe_points(), number_of_points=10, correct_index=PROBE_INDEX)
+    first_n_indices_are_correct(probe_points(), number_of_points=10,
+                                index=PROBE_INDEX)
 
 
 def test_probe_points_returns_a_generator():
@@ -74,7 +96,8 @@ def test_probe_points_returns_a_generator():
 def test_qual_points_first_ten_are_correct():
     from utils.constants import QUAL_INDEX
     from utils.data_io import qual_points
-    help_first_n_indices_of_generator_are_correct(qual_points(), number_of_points=10, correct_index=QUAL_INDEX)
+    first_n_indices_are_correct(qual_points(), number_of_points=10,
+                                index=QUAL_INDEX)
 
 
 def test_qual_points_returns_a_generator():
@@ -87,7 +110,8 @@ def test_qual_points_returns_a_generator():
 def test_valid_points_first_ten_are_correct():
     from utils.constants import VALID_INDEX
     from utils.data_io import valid_points
-    help_first_n_indices_of_generator_are_correct(valid_points(), number_of_points=10, correct_index=VALID_INDEX)
+    first_n_indices_are_correct(valid_points(), number_of_points=10,
+                                index=VALID_INDEX)
 
 
 def test_valid_points_returns_a_generator():
@@ -121,7 +145,10 @@ def test_write_submission_creates_file():
         write_submission(ratings, submission_file_name)
         assert os.path.isfile(submission_file_path), 'write_submission did not create {}'.format(submission_file_path)
     finally:
-        os.remove(submission_file_path)
+        try:
+            os.remove(submission_file_path)
+        except FileNotFoundError:
+            pass
 
 
 def test_write_submission_writes_correct_ratings():
@@ -139,4 +166,45 @@ def test_write_submission_writes_correct_ratings():
             for rating in ratings:
                 assert float(next(submission_file).strip()) == float(rating)
     finally:
-        os.remove(submission_file_path)
+        try:
+            os.remove(submission_file_path)
+        except FileNotFoundError:
+            pass
+
+
+def test_load_data_returns_numpy_array():
+    import numpy as np
+    import os
+    from utils.data_io import load_numpy_array_from_file
+    from utils.data_paths import DATA_DIR_PATH
+    expected_array = np.array([1, 2, 3, 4])
+    array_file_name = 'test.npy'
+    array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
+    np.save(array_file_path, expected_array)
+    try:
+        actual_array = load_numpy_array_from_file(array_file_path)
+        assert isinstance(actual_array, np.ndarray)
+    finally:
+        try:
+            os.remove(array_file_path)
+        except FileNotFoundError:
+            pass
+
+
+def test_load_numpy_array_from_file_returns_correct_array():
+    import numpy as np
+    import os
+    from utils.data_io import load_numpy_array_from_file
+    from utils.data_paths import DATA_DIR_PATH
+    expected_array = np.array([1, 2, 3, 4])
+    array_file_name = 'test.npy'
+    array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
+    np.save(array_file_path, expected_array)
+    try:
+        actual_array = load_numpy_array_from_file(array_file_path)
+        np.testing.assert_array_equal(expected_array, actual_array)
+    finally:
+        try:
+            os.remove(array_file_path)
+        except FileNotFoundError:
+            pass
