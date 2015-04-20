@@ -201,7 +201,7 @@ def test_svd_set_train_points_sets_train_points_to_expected_matrix():
 def test_svd_train_initializes_user_and_movie_feature_matrices():
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
-    model.update_features = MockThatAvoidsLongRunTime()
+    model.update_all_features = MockThatAvoidsLongRunTime()
     model.initialize_users_and_movies = MockThatTracksCallsWithoutRunning()
     model.train(simple_train_points)
     assert model.initialize_users_and_movies.call_count == 1
@@ -211,7 +211,7 @@ def test_svd_train_sets_ratings():
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
     model.initialize_users_and_movies = MockThatAvoidsErrors()
-    model.update_features = MockThatAvoidsLongRunTime()
+    model.update_all_features = MockThatAvoidsLongRunTime()
     model.set_train_points = MockThatTracksCallsWithoutRunning()
     model.train(simple_train_points)
     assert model.set_train_points.call_count == 1
@@ -221,9 +221,18 @@ def test_svd_train_updates_features_the_expected_number_of_times():
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
     number_of_epochs = 3
-    model.update_features = MockThatTracksCallsWithoutRunning()
+    model.update_all_features = MockThatTracksCallsWithoutRunning()
     model.train(simple_train_points, epochs=number_of_epochs)
-    assert model.update_features.call_count == number_of_epochs
+    assert model.update_all_features.call_count == number_of_epochs
+
+
+def test_svd_update_all_features_updates_each_feature_once_in_any_order():
+    model = svd.SVD()
+    model.update_feature = MockThatTracksCallsWithoutRunning()
+    model.update_all_features()
+    assert model.update_feature.call_count == model.num_features
+    expected_calls = [call(f) for f in range(model.num_features)]
+    model.update_feature.assert_has_calls(expected_calls, any_order=True)
 
 
 def test_svd_update_feature_calculates_prediction_error_at_least_once():
@@ -253,15 +262,6 @@ def test_svd_update_feature_updates_user_movie_for_each_train_point_any_order():
                      model.calculate_prediction_error(user, movie, rating)))
         model.update_user_and_movie.assert_has_calls(expected_calls,
                                                      any_order=True)
-
-
-def test_svd_update_features_updates_each_feature_once_in_any_order():
-    model = svd.SVD()
-    model.update_feature = MockThatTracksCallsWithoutRunning()
-    model.update_features()
-    assert model.update_feature.call_count == model.num_features
-    expected_calls = [call(f) for f in range(model.num_features)]
-    model.update_feature.assert_has_calls(expected_calls, any_order=True)
 
 
 def test_svd_update_user_and_movie_modifies_matrices_as_expected():

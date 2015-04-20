@@ -56,17 +56,17 @@ class SVD(Model):
         self.set_train_points(train_points)
         self.initialize_users_and_movies()
         for _ in range(epochs):
-            self.update_features()
+            self.update_all_features()
+
+    def update_all_features(self):
+        for feature in range(self.num_features):
+            self.update_feature(feature)
 
     def update_feature(self, feature):
         for train_point in self.train_points:
             user, movie, _, rating = get_user_movie_time_rating(train_point)
             error = self.calculate_prediction_error(user, movie, rating)
             self.update_user_and_movie(user, movie, feature, error)
-
-    def update_features(self):
-        for feature in range(self.num_features):
-            self.update_feature(feature)
 
     def update_user_and_movie(self, user, movie, feature, error):
         user_change = self.learn_rate * error * self.movies[feature, movie]
