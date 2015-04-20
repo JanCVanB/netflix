@@ -50,20 +50,20 @@ def sort_first_then_second(iterable):
     return sorted(sorted(iterable, key=lambda x: x[1]), key=lambda x: x[0])
 
 
-def test_svd_calculate_num_movies_returns_expected_number():
+def test_svd_calculate_max_movie_returns_expected_number():
     model = svd.SVD()
     initialize_model_with_simple_train_points_but_do_not_train(model)
-    expected_num_movies = np.amax(model.train_points[:, MOVIE_INDEX]) + 1
-    actual_num_movies = model.calculate_num_movies()
-    assert actual_num_movies == expected_num_movies
+    expected_max_movie = np.amax(model.train_points[:, MOVIE_INDEX]) + 1
+    actual_max_movie = model.calculate_max_movie()
+    assert actual_max_movie == expected_max_movie
 
 
-def test_svd_calculate_num_users_returns_expected_number():
+def test_svd_calculate_max_user_returns_expected_number():
     model = svd.SVD()
     initialize_model_with_simple_train_points_but_do_not_train(model)
-    expected_num_users = np.amax(model.train_points[:, USER_INDEX]) + 1
-    actual_num_users = model.calculate_num_users()
-    assert actual_num_users == expected_num_users
+    expected_max_user = np.amax(model.train_points[:, USER_INDEX]) + 1
+    actual_max_user = model.calculate_max_user()
+    assert actual_max_user == expected_max_user
 
 
 def test_svd_calculate_prediction_error_returns_expected_error():
@@ -161,11 +161,11 @@ def test_svd_initialize_users_and_movies_sets_expected_num_users_and_movies():
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
     model.set_train_points(simple_train_points)
-    expected_num_users = model.calculate_num_users()
-    expected_num_movies = model.calculate_num_movies()
+    expected_num_users = model.calculate_max_user()
+    expected_num_movies = model.calculate_max_movie()
     model.initialize_users_and_movies()
-    actual_num_users = model.num_users
-    actual_num_movies = model.num_movies
+    actual_num_users = model.max_user
+    actual_num_movies = model.max_movie
     np.testing.assert_array_equal(actual_num_users, expected_num_users)
     np.testing.assert_array_equal(actual_num_movies, expected_num_movies)
 
@@ -174,8 +174,8 @@ def test_svd_initialize_users_and_movies_sets_expected_users_movies_matrices():
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
     model.set_train_points(simple_train_points)
-    num_users = model.calculate_num_users()
-    num_movies = model.calculate_num_movies()
+    num_users = model.calculate_max_user()
+    num_movies = model.calculate_max_movie()
     expected_users = np.full((num_users, model.num_features),
                              model.feature_initial)
     expected_movies = np.full((model.num_features, num_movies),

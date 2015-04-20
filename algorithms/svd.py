@@ -18,13 +18,13 @@ class SVD(Model):
         self.users = None
         self.movies = None
         self.train_points = None
-        self.num_users = 0
-        self.num_movies = 0
+        self.max_user = 0
+        self.max_movie = 0
 
-    def calculate_num_movies(self):
+    def calculate_max_movie(self):
         return np.amax(self.train_points[:, MOVIE_INDEX]) + 1
 
-    def calculate_num_users(self):
+    def calculate_max_user(self):
         return np.amax(self.train_points[:, USER_INDEX]) + 1
 
     def calculate_prediction(self, user, movie):
@@ -34,11 +34,11 @@ class SVD(Model):
         return rating - self.calculate_prediction(user, movie)
 
     def initialize_users_and_movies(self):
-        self.num_users = self.calculate_num_users()
-        self.num_movies = self.calculate_num_movies()
-        self.users = np.full((self.num_users, self.num_features),
+        self.max_user = self.calculate_max_user()
+        self.max_movie = self.calculate_max_movie()
+        self.users = np.full((self.max_user, self.num_features),
                              self.feature_initial)
-        self.movies = np.full((self.num_features, self.num_movies),
+        self.movies = np.full((self.num_features, self.max_movie),
                               self.feature_initial)
 
     def iterate_train_points(self):
