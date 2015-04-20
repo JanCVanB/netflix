@@ -31,13 +31,9 @@ def make_simple_train_points():
                      (5, 1, 0, 3),
                      (2, 3, 0, 4),
                      (4, 5, 0, 5),
-                     (5, 2, 0, 1),
-                     (4, 1, 0, 2))
+                     (1, 3, 0, 1),
+                     (5, 2, 0, 2))
     return np.array(train_ratings)
-
-
-def sort_first_then_second(iterable):
-    return sorted(sorted(iterable, key=lambda x: x[1]), key=lambda x: x[0])
 
 
 def test_svd_calculate_max_movie_returns_expected_number():
