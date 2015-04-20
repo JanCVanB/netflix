@@ -12,9 +12,8 @@ MockThatTracksCallsWithoutRunning = Mock
 
 def initialize_model_with_simple_train_points_but_do_not_train(model):
     simple_train_points = make_simple_train_points()
-    model.set_train_points(make_simple_train_points())
+    model.set_train_points(simple_train_points)
     model.initialize_users_and_movies()
-    return simple_train_points
 
 
 def make_simple_test_points():
