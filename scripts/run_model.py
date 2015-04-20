@@ -13,8 +13,6 @@ def calculate_rmse(true_ratings, predictions):
 
 
 def run(model, train_set_name, test_set_name, epochs=None, features=None):
-    model.debug = True
-
     print('Training {modelclass} on "{train}" ratings'
           .format(modelclass=model.__class__.__name__, train=train_set_name))
     if epochs is not None:
@@ -22,11 +20,14 @@ def run(model, train_set_name, test_set_name, epochs=None, features=None):
     if features is not None:
         print('Number of features:', features)
     time_format = '%b-%d-%Hh-%Mm'
-    time_stamp = strftime(time_format, localtime())
     train_file_path = join(DATA_DIR_PATH, train_set_name + '.npy')
+    time_stamp = strftime(time_format, localtime())
+
+    model.debug = True
     train_points = load_numpy_array_from_file(train_file_path)
     model.train(train_points, epochs)
     time_stamp += '_to_' + strftime(time_format, localtime())
+    model.train_points = None
 
     epochs_string = '' if epochs is None else ('_%sepochs' % epochs)
     features_string = '' if features is None else ('_%sfeatures' % features)
