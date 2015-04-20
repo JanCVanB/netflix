@@ -41,11 +41,6 @@ class SVD(Model):
         self.movies = np.full((self.num_features, self.max_movie),
                               self.feature_initial)
 
-    def iterate_train_points(self):
-        for train_point in self.train_points:
-            if train_point[RATING_INDEX] > 0:
-                yield train_point
-
     def predict(self, test_points):
         num_test_points = test_points.shape[0]
         predictions = np.zeros(num_test_points)
@@ -64,7 +59,7 @@ class SVD(Model):
             self.update_features()
 
     def update_feature(self, feature):
-        for train_point in self.iterate_train_points():
+        for train_point in self.train_points:
             user, movie, _, rating = get_user_movie_time_rating(train_point)
             error = self.calculate_prediction_error(user, movie, rating)
             self.update_user_and_movie(user, movie, feature, error)

@@ -10,15 +10,6 @@ MockThatAvoidsLongRunTime = Mock
 MockThatTracksCallsWithoutRunning = Mock
 
 
-def assert_lists_of_tuples_are_equal(a, b):
-    a = sort_first_then_second(a)
-    b = sort_first_then_second(b)
-    assert len(a) == len(b)
-    assert all(all(a[i][j] == b[i][j]
-                   for j in range(len(a[i])))
-               for i in range(len(a)))
-
-
 def initialize_model_with_simple_train_points_but_do_not_train(model):
     simple_train_points = make_simple_train_points()
     model.set_train_points(make_simple_train_points())
@@ -40,7 +31,6 @@ def make_simple_train_points():
                      (5, 1, 0, 3),
                      (2, 3, 0, 4),
                      (4, 5, 0, 5),
-                     (1, 3, 0, 0),
                      (5, 2, 0, 1),
                      (4, 1, 0, 2))
     return np.array(train_ratings)
@@ -187,19 +177,6 @@ def test_svd_initialize_users_and_movies_sets_expected_users_movies_matrices():
     np.testing.assert_array_equal(actual_movies, expected_movies)
 
 
-def test_svd_iterate_train_points_generates_expected_points():
-    model = svd.SVD()
-    initialize_model_with_simple_train_points_but_do_not_train(model)
-    expected_training_points = []
-    for point in model.train_points:
-        rating = point[RATING_INDEX]
-        if rating > 0:
-            expected_training_points.append(point)
-    actual_training_points = model.iterate_train_points()
-    assert_lists_of_tuples_are_equal(actual_training_points,
-                                     expected_training_points)
-
-
 def test_svd_predict_returns_expected_ratings():
     from utils.data_io import get_user_movie_time_rating
     model = svd.SVD()
@@ -263,14 +240,13 @@ def test_svd_update_feature_updates_user_movie_for_each_train_point_any_order():
     from utils.data_io import get_user_movie_time_rating
     model = svd.SVD()
     initialize_model_with_simple_train_points_but_do_not_train(model)
-    train_points = list(model.iterate_train_points())
     for feature in range(model.num_features):
         model.update_user_and_movie = MockThatTracksCallsWithoutRunning()
         model.update_feature(feature)
-        expected_num_calls = len(train_points)
+        expected_num_calls = model.train_points.shape[0]
         assert model.update_user_and_movie.call_count == expected_num_calls
         expected_calls = []
-        for train_point in train_points:
+        for train_point in model.train_points:
             user, movie, time, rating = get_user_movie_time_rating(train_point)
             expected_calls.append(
                 call(user, movie, feature,
@@ -292,7 +268,7 @@ def test_svd_update_user_and_movie_modifies_matrices_as_expected():
     from utils.data_io import get_user_movie_time_rating
     model = svd.SVD()
     initialize_model_with_simple_train_points_but_do_not_train(model)
-    for train_point in model.iterate_train_points():
+    for train_point in model.train_points:
         user, movie, _, rating = get_user_movie_time_rating(train_point)
         for feature in range(model.num_features):
             error = model.calculate_prediction_error(user, movie, rating)
