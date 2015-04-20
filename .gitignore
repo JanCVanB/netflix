@@ -1,8 +1,11 @@
 .idea/
 *.pyc
-data/
-data
 *~
 *.swp
 *.dta
+data/
+data
 models/
+models
+results/
+results
