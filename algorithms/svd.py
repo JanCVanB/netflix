@@ -71,7 +71,7 @@ class SVD(Model):
 
     def update_feature(self, feature):
         if self.debug:
-            print('  Feature complete in... ', end='')
+            print('    time remaining: ', end='')
             sys.stdout.flush()
             num_points = self.train_points.shape[0]
             num_steps = 10
@@ -84,8 +84,11 @@ class SVD(Model):
                 if train_point_index >= progress + progress_step:
                     stop = time()
                     elapsed_mins = (stop - start) / 60
-                    print('{:.2g}min '
-                          .format(elapsed_mins * (num_steps - steps)), end='')
+                    elapsed_hrs = elapsed_mins / 60
+                    number = elapsed_hrs if elapsed_hrs > 1 else elapsed_mins
+                    label = 'hr' if number == elapsed_hrs else 'min'
+                    print('{:.2g}{} '
+                          .format(number * (num_steps - steps), label), end='')
                     sys.stdout.flush()
                     progress += progress_step
                     steps += 1
