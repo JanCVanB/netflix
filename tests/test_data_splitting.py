@@ -27,7 +27,8 @@ def test_write_numpy_array_to_file_creates_file():
     assert not os.path.isfile(array_file_path), 'GET THAT FILE OUTTA HERE!'
     try:
         write_numpy_array_to_file(input_array, array_file_path)
-        assert os.path.isfile(array_file_path), 'File not created by write_numpy_array_to_file'
+        assertion_message = 'File not created by write_numpy_array_to_file'
+        assert os.path.isfile(array_file_path), assertion_message
     finally:
         try:
             os.remove(array_file_path)

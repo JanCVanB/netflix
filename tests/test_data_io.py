@@ -62,7 +62,30 @@ def test_data_points_first_ten_are_correct():
 
     with open(ALL_DATA_FILE_PATH) as all_data_file:
         for _ in range(10):
-            assert next(data_points_generator) == next(all_data_file).strip().split()
+            point_from_file = next(all_data_file).strip().split()
+            point_from_generator = next(data_points_generator)
+            assert point_from_generator == point_from_file
+
+
+def test_get_user_movie_time_rating_returns_correct_values():
+    from random import random
+    from utils.constants import (MOVIE_INDEX, RATING_INDEX, TIME_INDEX,
+                                 USER_INDEX)
+    from utils.data_io import get_user_movie_time_rating
+    unique_user = random()
+    unique_movie = random()
+    unique_time = random()
+    unique_rating = random()
+    data_point = [0] * 4
+    data_point[USER_INDEX] = unique_user
+    data_point[MOVIE_INDEX] = unique_movie
+    data_point[TIME_INDEX] = unique_time
+    data_point[RATING_INDEX] = unique_rating
+    user, movie, time, rating = get_user_movie_time_rating(data_point)
+    assert user == unique_user
+    assert movie == unique_movie
+    assert time == unique_time
+    assert rating == unique_rating
 
 
 def test_hidden_points_first_ten_are_correct():
@@ -77,6 +100,55 @@ def test_hidden_points_returns_a_generator():
     from utils.data_io import hidden_points
 
     assert isinstance(hidden_points(), GeneratorType)
+
+
+def test_indices_first_ten_correct():
+    from utils.data_io import indices
+    from utils.data_paths import ALL_INDEX_FILE_PATH
+
+    indices_generator = indices(ALL_INDEX_FILE_PATH)
+
+    with open(ALL_INDEX_FILE_PATH) as all_index_file:
+        for _ in range(10):
+            assert next(indices_generator) == int(next(all_index_file).strip())
+
+
+def test_load_data_returns_numpy_array():
+    import numpy as np
+    import os
+    from utils.data_io import load_numpy_array_from_file
+    from utils.data_paths import DATA_DIR_PATH
+    expected_array = np.array([1, 2, 3, 4])
+    array_file_name = 'test.npy'
+    array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
+    np.save(array_file_path, expected_array)
+    try:
+        actual_array = load_numpy_array_from_file(array_file_path)
+        assert isinstance(actual_array, np.ndarray)
+    finally:
+        try:
+            os.remove(array_file_path)
+        except FileNotFoundError:
+            pass
+
+
+def test_load_numpy_array_from_file_returns_correct_array():
+    import numpy as np
+    import os
+    from utils.data_io import load_numpy_array_from_file
+    from utils.data_paths import DATA_DIR_PATH
+    expected_array = np.array([1, 2, 3, 4])
+    array_file_name = 'test.npy'
+    array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
+    np.save(array_file_path, expected_array)
+    try:
+        actual_array = load_numpy_array_from_file(array_file_path)
+        np.testing.assert_array_equal(expected_array, actual_array)
+    finally:
+        try:
+            os.remove(array_file_path)
+        except FileNotFoundError:
+            pass
 
 
 def test_probe_points_first_ten_are_correct():
@@ -121,29 +193,22 @@ def test_valid_points_returns_a_generator():
     assert isinstance(valid_points(), GeneratorType)
 
 
-def test_indices_first_ten_correct():
-    from utils.data_io import indices
-    from utils.data_paths import ALL_INDEX_FILE_PATH
-
-    indices_generator = indices(ALL_INDEX_FILE_PATH)
-
-    with open(ALL_INDEX_FILE_PATH) as all_index_file:
-        for _ in range(10):
-            assert next(indices_generator) == int(next(all_index_file).strip())
-
-
 def test_write_submission_creates_file():
     import os
     from utils.data_io import write_submission
     from utils.data_paths import SUBMISSIONS_DIR_PATH
     ratings = (1, 4, 3, 2, 5)
     submission_file_name = 'test.dta'
-    submission_file_path = os.path.join(SUBMISSIONS_DIR_PATH, submission_file_name)
-    assert not os.path.isfile(submission_file_path), "{} is for test_data_io's use only".format(submission_file_path)
+    submission_file_path = os.path.join(SUBMISSIONS_DIR_PATH,
+                                        submission_file_name)
+    assertion_message = '%s is for test use only' % submission_file_path
+    assert not os.path.isfile(submission_file_path), assertion_message
 
     try:
         write_submission(ratings, submission_file_name)
-        assert os.path.isfile(submission_file_path), 'write_submission did not create {}'.format(submission_file_path)
+        assertion_message = ('write_submission did not create %s' %
+                             submission_file_path)
+        assert os.path.isfile(submission_file_path), assertion_message
     finally:
         try:
             os.remove(submission_file_path)
@@ -157,8 +222,10 @@ def test_write_submission_writes_correct_ratings():
     from utils.data_paths import SUBMISSIONS_DIR_PATH
     ratings = (1, 4.0, 3.1, 2.01, 5.001)
     submission_file_name = 'test.dta'
-    submission_file_path = os.path.join(SUBMISSIONS_DIR_PATH, submission_file_name)
-    assert not os.path.isfile(submission_file_path), "{} is for test_data_io's use only".format(submission_file_path)
+    submission_file_path = os.path.join(SUBMISSIONS_DIR_PATH,
+                                        submission_file_name)
+    assertion_message = '%s is for test use only' % submission_file_path
+    assert not os.path.isfile(submission_file_path), assertion_message
 
     try:
         write_submission(ratings, submission_file_name)
@@ -168,43 +235,5 @@ def test_write_submission_writes_correct_ratings():
     finally:
         try:
             os.remove(submission_file_path)
-        except FileNotFoundError:
-            pass
-
-
-def test_load_data_returns_numpy_array():
-    import numpy as np
-    import os
-    from utils.data_io import load_numpy_array_from_file
-    from utils.data_paths import DATA_DIR_PATH
-    expected_array = np.array([1, 2, 3, 4])
-    array_file_name = 'test.npy'
-    array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
-    np.save(array_file_path, expected_array)
-    try:
-        actual_array = load_numpy_array_from_file(array_file_path)
-        assert isinstance(actual_array, np.ndarray)
-    finally:
-        try:
-            os.remove(array_file_path)
-        except FileNotFoundError:
-            pass
-
-
-def test_load_numpy_array_from_file_returns_correct_array():
-    import numpy as np
-    import os
-    from utils.data_io import load_numpy_array_from_file
-    from utils.data_paths import DATA_DIR_PATH
-    expected_array = np.array([1, 2, 3, 4])
-    array_file_name = 'test.npy'
-    array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
-    np.save(array_file_path, expected_array)
-    try:
-        actual_array = load_numpy_array_from_file(array_file_path)
-        np.testing.assert_array_equal(expected_array, actual_array)
-    finally:
-        try:
-            os.remove(array_file_path)
         except FileNotFoundError:
             pass
