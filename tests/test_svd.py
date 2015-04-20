@@ -2,7 +2,7 @@ import numpy as np
 from unittest.mock import call, Mock
 
 from algorithms import svd
-from utils.constants import MOVIE_INDEX, RATING_INDEX, USER_INDEX
+from utils.constants import MOVIE_INDEX, USER_INDEX
 
 
 MockThatAvoidsErrors = Mock
@@ -116,7 +116,7 @@ def test_svd_init_sets_default_feature_initial_value_for_custom_number():
                                     custom_number_of_features)
     model = svd.SVD(num_features=custom_number_of_features)
     actual_feature_initial = model.feature_initial
-    assert actual_feature_initial == expected_feature_initial
+    assert float(actual_feature_initial) == expected_feature_initial
 
 
 def test_svd_init_sets_default_feature_initial_value_for_default_number():
@@ -212,7 +212,7 @@ def test_svd_train_sets_ratings():
     assert model.set_train_points.call_count == 1
 
 
-def test_svd_train_updates_features_the_expected_number_of_times():
+def test_svd_train_updates_all_features_the_expected_number_of_times():
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
     number_of_epochs = 3
@@ -226,7 +226,7 @@ def test_svd_update_all_features_updates_each_feature_once_in_any_order():
     model.update_feature = MockThatTracksCallsWithoutRunning()
     model.update_all_features()
     assert model.update_feature.call_count == model.num_features
-    expected_calls = [call(f) for f in range(model.num_features)]
+    expected_calls = [call(feature) for feature in range(model.num_features)]
     model.update_feature.assert_has_calls(expected_calls, any_order=True)
 
 
@@ -276,7 +276,7 @@ def test_svd_update_user_and_movie_modifies_matrices_as_expected():
             expected_users[user, feature] += expected_user_change
             expected_movies[feature, movie] += expected_movie_change
             model.update_user_and_movie(user, movie, feature, error)
-            actual_users = np.copy(model.users)
-            actual_movies = np.copy(model.movies)
+            actual_users = model.users
+            actual_movies = model.movies
             np.testing.assert_array_equal(actual_users, expected_users)
             np.testing.assert_array_equal(actual_movies, expected_movies)
