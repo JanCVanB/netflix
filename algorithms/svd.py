@@ -1,5 +1,7 @@
 from math import sqrt
 import numpy as np
+import sys
+from time import time
 
 from algorithms.model import Model
 from utils.constants import ALGORITHM_DEFAULT_PREDICTION_INITIAL
@@ -58,17 +60,38 @@ class SVD(Model):
         self.initialize_users_and_movies()
         for epoch in range(epochs):
             if self.debug:
-                print('epoch #{}'.format(epoch + 1))
+                print('Epoch #{}'.format(epoch + 1))
             self.update_all_features()
 
     def update_all_features(self):
         for feature in range(self.num_features):
             if self.debug:
-                print('feature #{}'.format(feature + 1))
+                print('  Feature #{}'.format(feature + 1))
             self.update_feature(feature)
 
     def update_feature(self, feature):
-        for train_point in self.train_points:
+        if self.debug:
+            print('  Feature complete in... ', end='')
+            sys.stdout.flush()
+            num_points = self.train_points.shape[0]
+            num_steps = 10
+            progress = 0
+            progress_step = int(num_points / num_steps)
+            steps = 0
+            start = time()
+        for train_point_index, train_point in enumerate(self.train_points):
+            if self.debug:
+                if train_point_index >= progress + progress_step:
+                    stop = time()
+                    elapsed_mins = (stop - start) / 60
+                    print('{:.2g}min '
+                          .format(elapsed_mins * (num_steps - steps)), end='')
+                    sys.stdout.flush()
+                    progress += progress_step
+                    steps += 1
+                    if steps == num_steps:
+                        print()
+                    start = time()
             user, movie, _, rating = get_user_movie_time_rating(train_point)
             error = self.calculate_prediction_error(user, movie, rating)
             self.update_user_and_movie(user, movie, feature, error)
