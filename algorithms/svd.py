@@ -20,6 +20,7 @@ class SVD(Model):
         self.train_points = None
         self.max_user = 0
         self.max_movie = 0
+        self.debug = False
 
     def calculate_max_movie(self):
         return np.amax(self.train_points[:, MOVIE_INDEX]) + 1
@@ -55,11 +56,15 @@ class SVD(Model):
     def train(self, train_points, epochs=2):
         self.set_train_points(train_points)
         self.initialize_users_and_movies()
-        for _ in range(epochs):
+        for epoch in range(epochs):
+            if self.debug:
+                print('epoch #{}'.format(epoch + 1))
             self.update_all_features()
 
     def update_all_features(self):
         for feature in range(self.num_features):
+            if self.debug:
+                print('feature #{}'.format(feature + 1))
             self.update_feature(feature)
 
     def update_feature(self, feature):
