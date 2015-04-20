@@ -25,15 +25,6 @@ def test_model_save_creates_file_at_expected_file_path():
             pass
 
 
-def test_model_load_can_accept_file_path_argument():
-    from os.path import join
-    from utils.data_paths import MODELS_DIR_PATH
-    model = Model()
-    model_file_name = 'test'
-    model_file_path = join(MODELS_DIR_PATH, model_file_name)
-    model.load(model_file_path)
-
-
 def test_model_load_returns_none():
     from os.path import join
     from utils.data_paths import MODELS_DIR_PATH
