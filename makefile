@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-fPIC -shared
+CFLAGS=-shared
 
 LDIR =lib
 
