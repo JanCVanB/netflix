@@ -5,31 +5,53 @@ def test_model_can_create_instance_with_no_arguments():
     Model()
 
 
-def test_model_save_creates_file_at_expected_file_path():
-    import os.path
+def test_model_load_creates_the_expected_instance():
+    import numpy as np
+    import os
+    import pickle
+    from random import random
     from utils.data_paths import MODELS_DIR_PATH
     model = Model()
-    model_file_name = 'test'
-    model_file_path = os.path.join(MODELS_DIR_PATH, model_file_name)
-    assertion_message = '%s is for test use only' % model_file_path
-    assert not os.path.isfile(model_file_path), assertion_message
-
+    model.x = random()
+    model.y = np.array([random()])
+    load_file_name = 'test.p'
+    load_file_path = os.path.join(MODELS_DIR_PATH, load_file_name)
+    assert not os.path.isfile(load_file_path), ('{} is for test use only'
+                                                .format(load_file_path))
     try:
-        model.save(model_file_path)
-        assertion_message = 'save did not create %s' % model_file_path
-        assert os.path.isfile(model_file_path), assertion_message
+        with open(load_file_path, 'wb+') as load_file:
+            pickle.dump(model, load_file)
+        loaded_model = Model.load(load_file_name)
     finally:
         try:
-            os.remove(model_file_path)
+            os.remove(load_file_path)
         except FileNotFoundError:
             pass
+    assert loaded_model.x == model.x
+    np.testing.assert_array_equal(loaded_model.y, model.y)
 
 
-def test_model_load_returns_none():
-    from os.path import join
+def test_model_save_writes_the_expected_file():
+    import numpy as np
+    import os
+    import pickle
+    from random import random
     from utils.data_paths import MODELS_DIR_PATH
     model = Model()
-    model_file_name = 'test'
-    model_file_path = join(MODELS_DIR_PATH, model_file_name)
-    return_value = model.load(model_file_path)
-    assert return_value is None
+    model.x = random()
+    model.y = np.array([random()])
+    save_file_name = 'test.p'
+    save_file_path = os.path.join(MODELS_DIR_PATH, save_file_name)
+    assert not os.path.isfile(save_file_path), ('{} is for test use only'
+                                                .format(save_file_path))
+    try:
+        model.save(save_file_name)
+        with open(save_file_path, 'rb') as save_file:
+            saved_model = pickle.load(save_file)
+    finally:
+        try:
+            os.remove(save_file_path)
+        except FileNotFoundError:
+            pass
+    assert saved_model.x == model.x
+    np.testing.assert_array_equal(saved_model.y, model.y)

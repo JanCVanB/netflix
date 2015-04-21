@@ -24,7 +24,8 @@ def test_write_numpy_array_to_file_creates_file():
     input_array = np.ones((4, 3))
     array_file_name = 'array_test_file.npy'
     array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
-    assert not os.path.isfile(array_file_path), 'GET THAT FILE OUTTA HERE!'
+    assert not os.path.isfile(array_file_path), ('{} is for test use only'
+                                                 .format(array_file_path))
     try:
         write_numpy_array_to_file(input_array, array_file_path)
         assertion_message = 'File not created by write_numpy_array_to_file'
@@ -45,6 +46,8 @@ def test_write_numpy_array_to_file_creates_expected_file():
     expected_array = np.copy(input_array)
     array_file_name = 'array_test_file.npy'
     array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
+    assert not os.path.isfile(array_file_path), ('{} is for test use only'
+                                                 .format(array_file_path))
     try:
         write_numpy_array_to_file(input_array, array_file_path)
         actual_array = np.load(array_file_path)

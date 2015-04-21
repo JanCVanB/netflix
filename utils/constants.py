@@ -5,7 +5,7 @@ VALID_INDEX = 2
 """Index of "valid" points (2% of the training set picked at random)"""
 
 HIDDEN_INDEX = 3
-"""Index of "hidden" points (2% of the training set picked at random, use freely)"""
+"""Index of "hidden" points (2% of the training set picked at random)"""
 
 PROBE_INDEX = 4
 """Index of "probe" points (1/3 of the test set picked at random)"""
