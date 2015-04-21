@@ -2,6 +2,7 @@ from math import sqrt
 import numpy as np
 
 from algorithms.model import Model
+from utils.c_interface import c_svd_update_feature
 from utils.constants import ALGORITHM_DEFAULT_PREDICTION_INITIAL
 from utils.constants import MOVIE_INDEX, RATING_INDEX, USER_INDEX
 from utils.data_io import get_user_movie_time_rating
@@ -67,6 +68,10 @@ class SVD(Model):
             user, movie, _, rating = get_user_movie_time_rating(train_point)
             error = self.calculate_prediction_error(user, movie, rating)
             self.update_user_and_movie(user, movie, feature, error)
+
+    def update_feature_in_c(self, feature):
+        c_svd_update_feature(self.train_points, self.users, self.movies,
+                             feature, self.num_features, self.learn_rate)
 
     def update_user_and_movie(self, user, movie, feature, error):
         user_change = self.learn_rate * error * self.movies[feature, movie]
