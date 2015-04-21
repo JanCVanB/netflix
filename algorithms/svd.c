@@ -1,5 +1,6 @@
 int py_c_update_feature(int *train_points, int num_points, float *users, 
-	int num_users, float *movies, int num_movies, float learn_rate, int feature){
+	int num_users, float *movies, int num_movies, float learn_rate, int feature,
+    int num_features){
 	
 	int i, j;
 	float temp_prediction;
@@ -9,7 +10,7 @@ int py_c_update_feature(int *train_points, int num_points, float *users,
 	
 	for(i = 0; i < num_points; i++){
 		/* Get current variables   */
-		user   = (&train_points++;
+		user   = &train_points++;
 		movie  = &train_points++;
 		time   = &train_points++;
 		rating = &train_points++; 
