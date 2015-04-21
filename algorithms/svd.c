@@ -11,15 +11,15 @@ int c_update_feature(int *train_points, int num_points, float *users,
 	
 	for(i = 0; i < num_points; i++){
 		/* Get current variables   */
-		user   = &train_points++;
-		movie  = &train_points++;
-		time   = &train_points++;
-		rating = &train_points++; 
+		user   = train_cursor++;
+		movie  = train_cursor++;
+		time   = train_cursor++;
+		rating = train_cursor++; 
 		
 		/* Calculate prediction error */
 		/* TODO: Use residuals to avoid repeat dot product calculations */
-		temp_user_val  = &users[*user * num_features];
-		temp_movie_val = &movies[*movie * num_features];
+		temp_user_val  = users  + (*user * num_features);
+		temp_movie_val = movies + (*movie * num_features);
 		for(j = 0; j < num_features; j++){
 			temp_prediction += temp_user_val[j] * temp_movie_val[j];
 			
