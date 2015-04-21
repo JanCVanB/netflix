@@ -2,6 +2,9 @@
 *.pyc
 data/
 data
+lib/
 *~
 *.swp
 *.dta
+models
+results

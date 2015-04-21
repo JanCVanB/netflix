@@ -2,6 +2,7 @@ from math import sqrt
 import numpy as np
 
 from algorithms.model import Model
+from utils.c_interface import c_svd_update_feature
 from utils.constants import ALGORITHM_DEFAULT_PREDICTION_INITIAL
 from utils.constants import MOVIE_INDEX, RATING_INDEX, USER_INDEX
 from utils.data_io import get_user_movie_time_rating
@@ -28,7 +29,7 @@ class SVD(Model):
         return np.amax(self.train_points[:, USER_INDEX]) + 1
 
     def calculate_prediction(self, user, movie):
-        return np.dot(self.users[user, :], self.movies[:, movie])
+        return np.dot(self.users[user, :], self.movies[movie, :])
 
     def calculate_prediction_error(self, user, movie, rating):
         return rating - self.calculate_prediction(user, movie)
@@ -37,13 +38,13 @@ class SVD(Model):
         self.max_user = self.calculate_max_user()
         self.max_movie = self.calculate_max_movie()
         self.users = np.full((self.max_user, self.num_features),
-                             self.feature_initial)
-        self.movies = np.full((self.num_features, self.max_movie),
-                              self.feature_initial)
+                             self.feature_initial, dtype=np.float32)
+        self.movies = np.full((self.max_movie, self.num_features),
+                              self.feature_initial, dtype=np.float32)
 
     def predict(self, test_points):
         num_test_points = test_points.shape[0]
-        predictions = np.zeros(num_test_points)
+        predictions = np.zeros(num_test_points, dtype=np.float32)
         for i, test_point in enumerate(test_points):
             user, movie, _, _ = get_user_movie_time_rating(test_point)
             predictions[i] = self.calculate_prediction(user, movie)
@@ -68,8 +69,12 @@ class SVD(Model):
             error = self.calculate_prediction_error(user, movie, rating)
             self.update_user_and_movie(user, movie, feature, error)
 
+    def update_feature_in_c(self, feature):
+        c_svd_update_feature(self.train_points, self.users, self.movies,
+                             feature, self.num_features, self.learn_rate)
+
     def update_user_and_movie(self, user, movie, feature, error):
-        user_change = self.learn_rate * error * self.movies[feature, movie]
+        user_change = self.learn_rate * error * self.movies[movie, feature]
         movie_change = self.learn_rate * error * self.users[user, feature]
         self.users[user, feature] += user_change
-        self.movies[feature, movie] += movie_change
+        self.movies[movie, feature] += movie_change
