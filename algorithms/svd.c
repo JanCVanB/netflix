@@ -1,15 +1,15 @@
 int c_update_feature(int *train_points, int num_points, float *users, 
         int num_users, float *movies, int num_movies, float learn_rate, 
         int feature, int num_features){
-	
-	int i, j;
-	float temp_prediction;
-	float *temp_user_val, *temp_movie_val;
+
+	int p, f;
+	float prediction;
+	float *user_features, *movie_features;
 	float error, user_change, movie_change;
 	int *user,*movie,*time,*rating;
 	int *train_cursor = train_points;
 	
-	for(i = 0; i < num_points; i++){
+	for(p = 0; p < num_points; p++){
 		/* Get current variables   */
 		user   = train_cursor++;
 		movie  = train_cursor++;
@@ -18,20 +18,21 @@ int c_update_feature(int *train_points, int num_points, float *users,
 		
 		/* Calculate prediction error */
 		/* TODO: Use residuals to avoid repeat dot product calculations */
-		temp_user_val  = users  + (*user * num_features);
-		temp_movie_val = movies + (*movie * num_features);
-		for(j = 0; j < num_features; j++){
-			temp_prediction += temp_user_val[j] * temp_movie_val[j];
-			
+		user_features  = users + (*user * num_features);
+		movie_features = movies + (*movie * num_features);
+        prediction = 0;
+		for(f = 0; f < num_features; f++){
+			prediction += user_features[f] * movie_features[f];
 		}
 		
-		error = *rating - temp_prediction;
+		error = *rating - prediction;
 		/* Update user and movie */
-		user_change  = learn_rate * error * movies[(*movie * num_features) + feature];
-		movie_change = learn_rate * error * users[(*user  * num_features) + feature];
+		user_change  = learn_rate * error * movie_features[feature];
+		movie_change = learn_rate * error * user_features[feature];
 		
-		users[(*movie * num_features) + feature]   += user_change;
-		movies[(*user  * num_features) + feature]  += movie_change;
+		user_features[feature]  += user_change;
+		movie_features[feature] += movie_change;
 		/* */
 	}
+    return 0;
 }

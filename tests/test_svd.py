@@ -21,7 +21,7 @@ def make_simple_test_points():
                     (2, 5, 0, 1),
                     (3, 1, 0, 5),
                     (4, 2, 0, 0))
-    return np.array(test_ratings)
+    return np.array(test_ratings, dtype=np.int32)
 
 
 def make_simple_train_points():
@@ -32,7 +32,7 @@ def make_simple_train_points():
                      (4, 5, 0, 5),
                      (1, 3, 0, 1),
                      (5, 2, 0, 2))
-    return np.array(train_ratings)
+    return np.array(train_ratings, dtype=np.int32)
 
 
 def test_svd_calculate_max_movie_returns_expected_number():
@@ -162,9 +162,9 @@ def test_svd_initialize_users_and_movies_sets_expected_users_movies_matrices():
     num_users = model.calculate_max_user()
     num_movies = model.calculate_max_movie()
     expected_users = np.full((num_users, model.num_features),
-                             model.feature_initial)
+                             model.feature_initial, dtype=np.int32)
     expected_movies = np.full((model.num_features, num_movies),
-                              model.feature_initial)
+                              model.feature_initial, dtype=np.int32)
     model.initialize_users_and_movies()
     actual_users = model.users
     actual_movies = model.movies

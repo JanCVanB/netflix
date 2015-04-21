@@ -25,7 +25,7 @@ def test_py_c_can_write_to_numpy_array_in_memory():
     library_file_name = 'test_py_c_interface.so'
     library_file_path = os.path.join(LIBRARY_DIR_PATH, library_file_name)
     test_lib = ctypes.cdll.LoadLibrary(library_file_path)
-    returned_value = test_lib.py_c_write_test(ctypes.c_void_p(test_array[5:50].ctypes.data),
+    returned_value = test_lib.py_c_write_test(test_array[5:50].ctypes.data,
                                               ctypes.c_int32(45))
     assert returned_value == 0, 'Py/C was unable to write to the numpy array in memory.'
     np.testing.assert_array_equal(test_array, expected_array)

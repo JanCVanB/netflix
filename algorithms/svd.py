@@ -38,9 +38,9 @@ class SVD(Model):
         self.max_user = self.calculate_max_user()
         self.max_movie = self.calculate_max_movie()
         self.users = np.full((self.max_user, self.num_features),
-                             self.feature_initial)
+                             self.feature_initial, dtype=np.float32)
         self.movies = np.full((self.num_features, self.max_movie),
-                              self.feature_initial)
+                              self.feature_initial, dtype=np.float32)
 
     def predict(self, test_points):
         num_test_points = test_points.shape[0]

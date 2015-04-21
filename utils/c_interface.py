@@ -17,10 +17,12 @@ def c_svd_update_feature(train_points, users, movies, feature, num_features, lea
     import ctypes
     import os
     from utils.data_paths import LIBRARY_DIR_PATH
+    from numpy.ctypeslib import ndpointer
     library_file_name = 'svd.so'
     library_file_path = os.path.join(LIBRARY_DIR_PATH, library_file_name)
     svd_lib = ctypes.cdll.LoadLibrary(library_file_path)
-    returned_value = svd_lib.svd(
+    c_update_feature = svd_lib.c_update_feature
+    returned_value = c_update_feature(
         ctypes.c_void_p(train_points.ctypes.data),  # (void*) train_points
         ctypes.c_int32(train_points.shape[0]),      # (int)   num_training_points
         ctypes.c_void_p(users.ctypes.data),         # (void*) users
