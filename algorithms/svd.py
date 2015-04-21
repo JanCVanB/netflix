@@ -44,7 +44,7 @@ class SVD(Model):
 
     def predict(self, test_points):
         num_test_points = test_points.shape[0]
-        predictions = np.zeros(num_test_points)
+        predictions = np.zeros(num_test_points, dtype=np.float32)
         for i, test_point in enumerate(test_points):
             user, movie, _, _ = get_user_movie_time_rating(test_point)
             predictions[i] = self.calculate_prediction(user, movie)
