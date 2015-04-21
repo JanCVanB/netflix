@@ -1,7 +1,17 @@
-class Model:
-    def load(self, file_path):
-        pass
+import os
+import pickle
 
-    def save(self, file_path):
-        with open(file_path, 'w+') as file:
-            file.write('When you change this to pickle.dump, change w+ to wb+')
+from utils.data_paths import MODELS_DIR_PATH
+
+
+class Model:
+    @staticmethod
+    def load(file_name):
+        file_path = os.path.join(MODELS_DIR_PATH, file_name)
+        with open(file_path, 'rb') as file:
+            return pickle.load(file)
+
+    def save(self, file_name):
+        file_path = os.path.join(MODELS_DIR_PATH, file_name)
+        with open(file_path, 'wb+') as file:
+            pickle.dump(self, file)
