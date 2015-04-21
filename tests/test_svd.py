@@ -221,6 +221,22 @@ def test_svd_train_updates_all_features_the_expected_number_of_times():
     assert model.update_all_features.call_count == number_of_epochs
 
 
+def test_svd_update_all_features_calls_update_feature_in_c_when_expected():
+    c_model = svd.SVD()
+    py_model = svd.SVD()
+    c_model.run_c = True
+    c_model.update_feature = MockThatTracksCallsWithoutRunning()
+    py_model.update_feature = MockThatTracksCallsWithoutRunning()
+    c_model.update_feature_in_c = MockThatTracksCallsWithoutRunning()
+    py_model.update_feature_in_c = MockThatTracksCallsWithoutRunning()
+    c_model.update_all_features()
+    py_model.update_all_features()
+    assert c_model.update_feature.call_count == 0
+    assert c_model.update_feature_in_c.call_count > 0
+    assert py_model.update_feature.call_count > 0
+    assert py_model.update_feature_in_c.call_count == 0
+
+
 def test_svd_update_all_features_updates_each_feature_once_in_any_order():
     model = svd.SVD()
     model.update_feature = MockThatTracksCallsWithoutRunning()
@@ -259,6 +275,21 @@ def test_svd_update_feature_updates_user_movie_for_each_train_point_any_order():
                                                      any_order=True)
 
 
+def test_svd_update_feature_in_c_modifies_users_and_movies_as_expected():
+    c_model = svd.SVD()
+    py_model = svd.SVD()
+    initialize_model_with_simple_train_points_but_do_not_train(c_model)
+    initialize_model_with_simple_train_points_but_do_not_train(py_model)
+    np.testing.assert_array_equal(c_model.train_points, py_model.train_points)
+    np.testing.assert_array_equal(c_model.users, py_model.users)
+    np.testing.assert_array_equal(c_model.movies, py_model.movies)
+    for feature in range(c_model.num_features):
+        c_model.update_feature_in_c(feature)
+        py_model.update_feature(feature)
+        np.testing.assert_array_equal(c_model.users, py_model.users)
+        np.testing.assert_array_equal(c_model.movies, py_model.movies)
+
+
 def test_svd_update_user_and_movie_modifies_matrices_as_expected():
     from utils.data_io import get_user_movie_time_rating
     model = svd.SVD()
@@ -280,18 +311,3 @@ def test_svd_update_user_and_movie_modifies_matrices_as_expected():
             actual_movies = model.movies
             np.testing.assert_array_equal(actual_users, expected_users)
             np.testing.assert_array_equal(actual_movies, expected_movies)
-
-
-def test_svd_update_feature_in_c_modifies_users_and_movies_as_expected():
-    c_model = svd.SVD()
-    py_model = svd.SVD()
-    initialize_model_with_simple_train_points_but_do_not_train(c_model)
-    initialize_model_with_simple_train_points_but_do_not_train(py_model)
-    np.testing.assert_array_equal(c_model.train_points, py_model.train_points)
-    np.testing.assert_array_equal(c_model.users, py_model.users)
-    np.testing.assert_array_equal(c_model.movies, py_model.movies)
-    for feature in range(c_model.num_features):
-        c_model.update_feature_in_c(feature)
-        py_model.update_feature(feature)
-        np.testing.assert_array_equal(c_model.users, py_model.users)
-        np.testing.assert_array_equal(c_model.movies, py_model.movies)
