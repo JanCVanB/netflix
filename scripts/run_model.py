@@ -1,3 +1,4 @@
+from math import sqrt
 from os.path import abspath, dirname, join
 import sys
 import pickle
@@ -10,7 +11,7 @@ from utils.data_paths import (DATA_DIR_PATH, MODELS_DIR_PATH_IGNORE,
 
 
 def calculate_rmse(true_ratings, predictions):
-    return ((predictions - true_ratings) ** 2).mean()
+    return sqrt(((predictions - true_ratings) ** 2).mean())
 
 
 def run(model, train_set_name, test_set_name, epochs=None, features=None):
