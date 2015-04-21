@@ -29,7 +29,7 @@ class SVD(Model):
         return np.amax(self.train_points[:, USER_INDEX]) + 1
 
     def calculate_prediction(self, user, movie):
-        return np.dot(self.users[user, :], self.movies[:, movie])
+        return np.dot(self.users[user, :], self.movies[movie, :])
 
     def calculate_prediction_error(self, user, movie, rating):
         return rating - self.calculate_prediction(user, movie)
@@ -39,7 +39,7 @@ class SVD(Model):
         self.max_movie = self.calculate_max_movie()
         self.users = np.full((self.max_user, self.num_features),
                              self.feature_initial, dtype=np.float32)
-        self.movies = np.full((self.num_features, self.max_movie),
+        self.movies = np.full((self.max_movie, self.num_features),
                               self.feature_initial, dtype=np.float32)
 
     def predict(self, test_points):
@@ -74,7 +74,7 @@ class SVD(Model):
                              feature, self.num_features, self.learn_rate)
 
     def update_user_and_movie(self, user, movie, feature, error):
-        user_change = self.learn_rate * error * self.movies[feature, movie]
+        user_change = self.learn_rate * error * self.movies[movie, feature]
         movie_change = self.learn_rate * error * self.users[user, feature]
         self.users[user, feature] += user_change
-        self.movies[feature, movie] += movie_change
+        self.movies[movie, feature] += movie_change

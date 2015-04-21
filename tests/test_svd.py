@@ -71,7 +71,7 @@ def test_svd_calculate_prediction_returns_expected_prediction():
     for test_point in simple_test_points:
         user, movie, _, _ = get_user_movie_time_rating(test_point)
         expected_prediction = np.dot(model.users[user, :],
-                                     model.movies[:, movie])
+                                     model.movies[movie, :])
         actual_prediction = model.calculate_prediction(user, movie)
         assert actual_prediction == expected_prediction
 
@@ -163,7 +163,7 @@ def test_svd_initialize_users_and_movies_sets_expected_users_movies_matrices():
     num_movies = model.calculate_max_movie()
     expected_users = np.full((num_users, model.num_features),
                              model.feature_initial, dtype=np.int32)
-    expected_movies = np.full((model.num_features, num_movies),
+    expected_movies = np.full((num_movies, model.num_features),
                               model.feature_initial, dtype=np.int32)
     model.initialize_users_and_movies()
     actual_users = model.users
@@ -270,11 +270,11 @@ def test_svd_update_user_and_movie_modifies_matrices_as_expected():
             expected_users = np.copy(model.users)
             expected_movies = np.copy(model.movies)
             expected_user_change = (model.learn_rate * error *
-                                    model.movies[feature, movie])
+                                    model.movies[movie, feature])
             expected_movie_change = (model.learn_rate * error *
                                      model.users[user, feature])
             expected_users[user, feature] += expected_user_change
-            expected_movies[feature, movie] += expected_movie_change
+            expected_movies[movie, feature] += expected_movie_change
             model.update_user_and_movie(user, movie, feature, error)
             actual_users = model.users
             actual_movies = model.movies
