@@ -1,12 +1,11 @@
 from math import sqrt
 from os.path import abspath, dirname, join
 import sys
-import pickle
 from time import localtime, strftime
 
 sys.path.append(abspath(dirname(dirname(__file__))))
 from utils.data_io import load_numpy_array_from_file
-from utils.data_paths import DATA_DIR_PATH, MODELS_DIR_PATH, RESULTS_DIR_PATH
+from utils.data_paths import DATA_DIR_PATH, RESULTS_DIR_PATH
 
 
 def calculate_rmse(true_ratings, predictions):
@@ -37,7 +36,7 @@ def run(model, train_set_name, test_set_name, epochs=None, features=None):
                                   f=features_string, time=time_stamp))
 
     model_file_name = template_file_name.replace('xxx', 'model') + '.p'
-    save_model(model, model_file_name)
+    model.save(model_file_name)
 
     print('Predicting "{test}" ratings'.format(test=test_set_name))
     test_file_path = join(DATA_DIR_PATH, test_set_name + '.npy')
@@ -52,12 +51,6 @@ def run(model, train_set_name, test_set_name, epochs=None, features=None):
     rmse_file_name = (template_file_name.replace('xxx', 'rmse_' + test_set_name)
                       + '.txt')
     save_rmse(rmse, rmse_file_name)
-
-
-def save_model(model, model_file_name):
-    model_file_path = join(MODELS_DIR_PATH, model_file_name)
-    with open(model_file_path, 'wb+') as model_file:
-        pickle.dump(model, model_file)
 
 
 def save_predictions(predictions, predictions_file_name):
