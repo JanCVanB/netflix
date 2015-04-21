@@ -4,7 +4,7 @@ int c_update_feature(int *train_points, int num_points, float *users,
 	
 	int i, j;
 	float temp_prediction;
-	int *temp_user_val, *temp_movie_val;
+	float *temp_user_val, *temp_movie_val;
 	float error, user_change, movie_change;
 	int *user,*movie,*time,*rating;
 	int *train_cursor = train_points;
