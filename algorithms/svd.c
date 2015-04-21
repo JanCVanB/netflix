@@ -1,5 +1,5 @@
-int static py_c_update_feature(int *train_points, int num_points, float *u, 
-	int num_users, float *v, int num_movies){
+int py_c_update_feature(int *train_points, int num_points, float *users, 
+	int num_users, float *movies, int num_movies, float learn_rate, int feature){
 	int i;
 	float error, user_change, movie_change;
 	int *user,*movie,*time,*rating;
@@ -14,7 +14,8 @@ int static py_c_update_feature(int *train_points, int num_points, float *u,
 		/* Calculate prediction error */
 		error = rating - calculate_prediction(user, movie);
 		/* Update user and movie */
-		
+		user_change = learn_rate * error * movies[feature][movie];
+		movie_change = learn_rate * error * users[user][feature];
 		/* */
 	}
 }
