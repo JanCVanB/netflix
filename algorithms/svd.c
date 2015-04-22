@@ -69,8 +69,8 @@ int c_update_feature_with_pointers(int *train_points, int num_points, float *use
 		}
 		error = *rating - prediction;
 
-		user_features_cursor  = user_features[feature];
-		movie_features_cursor = movie_features[feature];
+		user_features_cursor  = &user_features[feature];
+		movie_features_cursor = &movie_features[feature];
 		/* Update user and movie */
 		user_change  = learn_rate * error * *movie_features_cursor;
 		movie_change = learn_rate * error * *user_features_cursor;
@@ -119,8 +119,9 @@ int c_update_feature_with_residuals(int *train_points, int num_points, float *us
 		}
 		error = *rating - prediction;
 
-		user_features_cursor  = user_features[feature];
-		movie_features_cursor = movie_features[feature];
+		user_features_cursor  = &user_features[feature];
+		movie_features_cursor = &movie_features[feature];
+
 		/* Update user and movie */
 		user_change  = learn_rate * error * *movie_features_cursor;
 		movie_change = learn_rate * error * *user_features_cursor;
