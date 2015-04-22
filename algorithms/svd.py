@@ -80,26 +80,27 @@ class SVD(Model):
             sys.stdout.flush()
             num_points = self.train_points.shape[0]
             num_steps = 10
-            progress = 0
-            progress_step = int(num_points / num_steps)
-            steps = 0
+            cutoff = 5e5
+            next_point = 1e5
+            step = 0
             start = time()
-        for train_point_index, train_point in enumerate(self.train_points):
+        for index, train_point in enumerate(self.train_points):
             if self.debug:
-                if train_point_index >= progress + progress_step:
+                if index >= next_point and index < num_points - cutoff:
                     stop = time()
+                    step += 1
                     elapsed_secs = (stop - start)
                     elapsed_mins = elapsed_secs / 60
-                    number = elapsed_mins if elapsed_mins > 1 else elapsed_secs
-                    label = 'min' if number == elapsed_mins else 'sec'
+                    elapsed_time = (elapsed_mins if elapsed_mins > 1
+                                    else elapsed_secs)
+                    label = 'min' if elapsed_time == elapsed_mins else 'sec'
                     print('{:.2g}{} '
-                          .format(number * (num_steps - steps), label), end='')
+                          .format(elapsed_time * (num_points - index) / index,
+                                  label), end='')
                     sys.stdout.flush()
-                    progress += progress_step
-                    steps += 1
-                    if steps == num_steps:
+                    next_point = num_points - num_points / 2 ** step
+                    if next_point >= num_points - cutoff:
                         print()
-                    start = time()
             user, movie, _, rating = get_user_movie_time_rating(train_point)
             error = self.calculate_prediction_error(user, movie, rating)
             self.update_user_and_movie(user, movie, feature, error)
