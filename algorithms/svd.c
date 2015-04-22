@@ -102,16 +102,20 @@ int c_update_feature_with_residuals(int *train_points, int num_points, float *us
 		rating = train_cursor++;
 
 		/* Calculate prediction error */
-		/* TODO: Use residuals to avoid repeat dot product calculations */
 		user_features  = users + (*user * num_features);
-		movie_features = movies + (*movie * num_features);
-		user_features_cursor  = user_features;
-		movie_features_cursor = movie_features;
+        movie_features = movies + (*movie * num_features);
+        user_features_cursor  = user_features;
+        movie_features_cursor = movie_features;
         prediction = 0;
-		for(f = 0; f < num_features; f++){
-			prediction += *user_features_cursor * *movie_features_cursor;
-			user_features_cursor++;
-			movie_features_cursor++;
+		if(feature == 0){
+            for(f = 0; f < num_features; f++){
+                prediction += *user_features_cursor * *movie_features_cursor;
+                user_features_cursor++;
+                movie_features_cursor++;
+            }
+            residuals[p] = prediction;
+		}else{
+		    prediction = residuals[p];
 		}
 		error = *rating - prediction;
 
@@ -120,10 +124,13 @@ int c_update_feature_with_residuals(int *train_points, int num_points, float *us
 		/* Update user and movie */
 		user_change  = learn_rate * error * *movie_features_cursor;
 		movie_change = learn_rate * error * *user_features_cursor;
+        /* mmm save the residual */
+		residuals[p] = prediction - (*user_features_cursor * *movie_features_cursor);
 
 		*user_features_cursor  += user_change;
 		*movie_features_cursor += movie_change;
-		/* */
+
+		residuals[p] += (*user_features_cursor * *movie_features_cursor);
 	}
     return 0;
 }
