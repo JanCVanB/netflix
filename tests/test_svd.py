@@ -186,6 +186,33 @@ def test_svd_predict_returns_expected_ratings():
     np.testing.assert_array_equal(actual_ratings, expected_ratings)
 
 
+def test_svd_train_more_does_not_set_train_points_when_none_passed():
+    model = svd.SVD()
+    model.initialize_users_and_movies = MockThatAvoidsErrors()
+    model.update_all_features = MockThatAvoidsLongRunTime()
+    model.set_train_points = MockThatTracksCallsWithoutRunning()
+    model.train_more()
+    assert model.set_train_points.call_count == 0
+
+
+def test_svd_train_more_sets_train_points_when_train_points_passed():
+    model = svd.SVD()
+    simple_train_points = make_simple_train_points()
+    model.initialize_users_and_movies = MockThatAvoidsErrors()
+    model.update_all_features = MockThatAvoidsLongRunTime()
+    model.set_train_points = MockThatTracksCallsWithoutRunning()
+    model.train_more(simple_train_points)
+    assert model.set_train_points.call_count == 1
+
+
+def test_svd_train_more_updates_all_features_the_expected_number_of_times():
+    model = svd.SVD()
+    number_of_epochs = 3
+    model.update_all_features = MockThatTracksCallsWithoutRunning()
+    model.train_more(epochs=number_of_epochs)
+    assert model.update_all_features.call_count == number_of_epochs
+
+
 def test_svd_set_train_points_sets_train_points_to_expected_matrix():
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
@@ -202,7 +229,7 @@ def test_svd_train_initializes_user_and_movie_feature_matrices():
     assert model.initialize_users_and_movies.call_count == 1
 
 
-def test_svd_train_sets_ratings():
+def test_svd_train_sets_train_points():
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
     model.initialize_users_and_movies = MockThatAvoidsErrors()

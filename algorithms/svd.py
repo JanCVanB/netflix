@@ -57,9 +57,17 @@ class SVD(Model):
     def set_train_points(self, train_points):
         self.train_points = train_points
 
-    def train(self, train_points, epochs=2):
+    def train(self, train_points, epochs=1):
         self.set_train_points(train_points)
         self.initialize_users_and_movies()
+        for epoch in range(epochs):
+            if self.debug:
+                print('Epoch #{}'.format(epoch + 1))
+            self.update_all_features()
+
+    def train_more(self, train_points=None, epochs=1):
+        if train_points is not None:
+            self.set_train_points(train_points)
         for epoch in range(epochs):
             if self.debug:
                 print('Epoch #{}'.format(epoch + 1))
