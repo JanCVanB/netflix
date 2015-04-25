@@ -6,7 +6,7 @@ from time import time
 from algorithms.model import Model
 from utils.c_interface import c_svd_update_feature
 from utils.constants import ALGORITHM_DEFAULT_PREDICTION_INITIAL
-from utils.constants import MOVIE_INDEX, RATING_INDEX, USER_INDEX
+from utils.constants import MOVIE_INDEX, USER_INDEX
 from utils.data_io import get_user_movie_time_rating
 
 
@@ -18,9 +18,9 @@ class SVD(Model):
         if self.feature_initial is None:
             self.feature_initial = sqrt(ALGORITHM_DEFAULT_PREDICTION_INITIAL /
                                         self.num_features)
-        self.users = None
-        self.movies = None
-        self.train_points = None
+        self.users = np.array([])
+        self.movies = np.array([])
+        self.train_points = np.array([])
         self.max_user = 0
         self.max_movie = 0
         self.debug = False
@@ -87,21 +87,20 @@ class SVD(Model):
             print('    time left: ', end='')
             sys.stdout.flush()
             num_points = self.train_points.shape[0]
-            num_steps = 10
             cutoff = 5e5
             next_point = 1e5
             step = 0
             start = time()
         for index, train_point in enumerate(self.train_points):
             if self.debug:
-                if index >= next_point and index < num_points - cutoff:
+                if next_point <= index < num_points - cutoff:
                     stop = time()
                     step += 1
                     elapsed_secs = (stop - start)
-                    elapsed_mins = elapsed_secs / 60
-                    elapsed_time = (elapsed_mins if elapsed_mins > 1
+                    elapsed_minutes = elapsed_secs / 60
+                    elapsed_time = (elapsed_minutes if elapsed_minutes > 1
                                     else elapsed_secs)
-                    label = 'min' if elapsed_time == elapsed_mins else 'sec'
+                    label = 'min' if elapsed_time == elapsed_minutes else 'sec'
                     print('{:.2g}{} '
                           .format(elapsed_time * (num_points - index) / index,
                                   label), end='')

@@ -51,12 +51,12 @@ def test_write_numpy_array_to_file_creates_expected_file():
     try:
         write_numpy_array_to_file(input_array, array_file_path)
         actual_array = np.load(array_file_path)
+        np.testing.assert_array_equal(actual_array, expected_array)
     finally:
         try:
             os.remove(array_file_path)
         except FileNotFoundError:
             pass
-    np.testing.assert_array_equal(actual_array, expected_array)
 
 
 def test_create_numpy_array_from_generator_returns_numpy_array():
@@ -77,9 +77,7 @@ def test_create_numpy_array_from_generator_returns_numpy_array():
 def test_create_numpy_array_from_generator_returns_expected_array():
     import numpy as np
     from utils.data_splitting import create_numpy_array_from_generator
-    from random import randint
-    expected_array = np.array([[randint(0, 999) for _ in range(4)]
-                               for __ in range(5)], dtype=np.int32)
+    expected_array = np.random.randint(0, 999, (5, 4)).astype(np.int32)
     overestimated_shape = (10, 4)
 
     def input_generator():
