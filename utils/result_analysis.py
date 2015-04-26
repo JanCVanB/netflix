@@ -5,8 +5,9 @@ __author__ = 'quinnosha'
 .. moduleauthor:: Quinn Osha
 """
 
-
+import sys
 from os.path import abspath, dirname, join
+sys.path.append(abspath(dirname(dirname(__file__))))
 from utils.data_paths import RESULTS_DIR_PATH
 
 def find_lowest_rmse(rmse_file_name):
@@ -23,6 +24,6 @@ def find_lowest_rmse(rmse_file_name):
 
 
 if __name__ == '__main__':
-    rmse_file_name = 'svd_base_8epochs_100features__rmse_valid_Apr-26-12h-43m.txt'
+    rmse_file_name = 'svd_base_8epochs_100features_rmse_valid_Apr-26-12h-43m.txt'
     lowest_rmse = find_lowest_rmse(rmse_file_name)
     print(lowest_rmse)
