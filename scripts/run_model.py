@@ -78,7 +78,7 @@ def run_multi(model, train_set_name, test_set_name, epochs=None, features=None):
     model.debug = True
     for epoch in range(epochs):
         print('Training epoch {}:'.format(epoch))
-        if epoch == 1:
+        if epoch == 0:
             model.train(train_points, epochs=1)
         else:
             model.train_more(epochs=1)
