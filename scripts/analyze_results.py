@@ -33,21 +33,27 @@ def graph_rmse_surface(algorithm_name, train_name, test_name, max_epochs,
                 file_path = join(RESULTS_DIR_PATH, file_name)
                 desired_file_paths.append(file_path)
 
-    rmse_values = []
+    points = []
     for file_path in desired_file_paths:
         file_name_parts = split_results_file_name(file_path)
         features = file_name_parts['features']
+        rmse_values = []
         with open(file_path) as rmse_file:
-            epoch = 0
             for line in rmse_file:
-                epoch += 1
                 rmse_value = float(line.strip())
-                rmse_values.append((epoch, features, rmse_value))
+                rmse_values.append(rmse_value)
+        if len(rmse_values) == 1:
+            points.append((max_epochs, features, rmse_values[0]))
+        else:
+            epoch = 0
+            for rmse_value in rmse_values:
+                epoch += 1
+                points.append((epoch, features, rmse_value))
     figure = plt.figure()
     axes = figure.add_subplot(111, projection='3d')
-    x = [value[0] for value in rmse_values]
-    y = [value[1] for value in rmse_values]
-    z = [value[2] for value in rmse_values]
+    x = [value[0] for value in points]
+    y = [value[1] for value in points]
+    z = [value[2] for value in points]
     axes.set_xlim(min(x), max(x))
     axes.set_ylim(min(y), max(y))
     axes.set_zlim(int(min(z) * 100) / 100, int(max(z) * 100 + 1) / 100)
@@ -57,12 +63,13 @@ def graph_rmse_surface(algorithm_name, train_name, test_name, max_epochs,
     min_rmse_x = x[min_rmse_index]
     min_rmse_y = y[min_rmse_index]
     min_rmse_z = z[min_rmse_index]
+    min_rmse_color = '#00DD00'
     axes.plot([min_rmse_x] * 2, axes.get_ylim(), zs=[axes.get_zlim()[0]] * 2,
-              color='#00DD00', ls=':')
+              color=min_rmse_color, ls=':')
     axes.plot(axes.get_xlim(), [min_rmse_y] * 2, zs=[axes.get_zlim()[0]] * 2,
-              color='#00DD00', ls=':')
+              color=min_rmse_color, ls=':')
     axes.plot([min_rmse_x] * 2, [min_rmse_y] * 2,
-              zs=[axes.get_zlim()[0], min_rmse_z], color='#00DD00', ls=':')
+              zs=[axes.get_zlim()[0], min_rmse_z], color=min_rmse_color, ls=':')
     if len(set(x)) == 1 or len(set(y)) == 1:
         axes.plot(x, y, z)
     else:
@@ -78,9 +85,9 @@ def graph_rmse_surface(algorithm_name, train_name, test_name, max_epochs,
     label = axes.annotate(
         '{:.3g}'.format(min_rmse_z), xy=(xp, yp), xytext = (-20, 40),
         textcoords = 'offset points', ha = 'right', va = 'bottom',
-        bbox = dict(boxstyle='round,pad=0.5', fc='#00DD00', alpha=0.5),
+        bbox = dict(boxstyle='round,pad=0.5', fc=min_rmse_color, alpha=0.5),
         arrowprops = dict(arrowstyle='->', connectionstyle='arc3,rad=0',
-                          color='#00DD00'))
+                          color=min_rmse_color))
 
     def update_position(e):
         xp, yp, _ = proj3d.proj_transform(min_rmse_x, min_rmse_y, min_rmse_z,
@@ -103,13 +110,12 @@ def lowest_rmse(file_name):
 
 
 def split_results_file_name(file_name):
-    algorithm, train, epochs, features, result, test, time = file_name.split('_')
+    algorithm, train, epochs, features, result, test, *_ = file_name.split('_')
     parts = {'algorithm': algorithm,
              'epochs': int(epochs[:epochs.index('e')]),
              'features': int(features[:features.index('f')]),
              'result': result,
              'test': test,
-             'time': time[:time.index('.')],
              'train': train}
     return parts
 
