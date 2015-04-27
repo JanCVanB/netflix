@@ -5,7 +5,7 @@
 """
 from fnmatch import fnmatch
 from matplotlib import cm
-from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import MaxNLocator, MultipleLocator
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import proj3d
 from os.path import abspath, dirname, join
@@ -78,7 +78,7 @@ def graph_rmse_surface(algorithm_name, train_name, test_name, max_epochs,
                    .format(train=train_name, test=test_name))
     axes.set_xlabel('Number of Epochs')
     axes.set_ylabel('Number of Features')
-    axes.set_zlabel('RMSE')
+    axes.set_zlabel('RMSE ')
 
     xp, yp, _ = proj3d.proj_transform(min_rmse_x, min_rmse_y, min_rmse_z,
                                       axes.get_proj())
@@ -96,6 +96,7 @@ def graph_rmse_surface(algorithm_name, train_name, test_name, max_epochs,
         label.update_positions(figure.canvas.renderer)
         figure.canvas.draw()
     figure.canvas.mpl_connect('button_release_event', update_position)
+    plt.savefig(join(RESULTS_DIR_PATH, 'analyze_results.png'))
     plt.show()
 
 
