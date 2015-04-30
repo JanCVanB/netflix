@@ -4,7 +4,7 @@ import sys
 from time import time
 
 from algorithms.model import Model
-from utils.c_interface import c_svd_update_feature, c_svd_update_feature_with_pointers
+from utils.c_interface import c_svd_update_feature, c_svd_update_feature_with_pointers, c_svd_update_feature_with_residuals
 from utils.constants import ALGORITHM_DEFAULT_PREDICTION_INITIAL
 from utils.constants import MOVIE_INDEX, USER_INDEX
 from utils.data_io import get_user_movie_time_rating
@@ -20,6 +20,7 @@ class SVD(Model):
                                         self.num_features)
         self.users = np.array([])
         self.movies = np.array([])
+        self.residuals = np.array([])
         self.train_points = np.array([])
         self.max_user = 0
         self.max_movie = 0
@@ -56,6 +57,7 @@ class SVD(Model):
 
     def set_train_points(self, train_points):
         self.train_points = train_points
+        self.residuals = np.full(self.train_points.shape[0],0, dtype=np.float32)
 
     def train(self, train_points, epochs=1):
         self.set_train_points(train_points)
@@ -118,6 +120,10 @@ class SVD(Model):
 
     def update_feature_in_c_with_pointers(self, feature):
         c_svd_update_feature_with_pointers(self.train_points, self.users, self.movies,
+                             feature, self.num_features, self.learn_rate)
+
+    def update_feature_in_c_with_residuals(self, feature):
+        c_svd_update_feature_with_residuals(self.train_points, self.users, self.movies, self.residuals,
                              feature, self.num_features, self.learn_rate)
 
     def update_user_and_movie(self, user, movie, feature, error):
