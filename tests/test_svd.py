@@ -342,8 +342,8 @@ def test_svd_update_feature_in_c_with_residuals_modifies_users_and_movies_as_exp
     for feature in range(c_model.num_features):
         c_model.update_feature_in_c_with_residuals(feature)
         py_model.update_feature(feature)
-        np.testing.assert_array_equal(c_model.users, py_model.users)
-        np.testing.assert_array_equal(c_model.movies, py_model.movies)
+        np.testing.assert_allclose(c_model.users, py_model.users, rtol=1e-04)
+        np.testing.assert_allclose(c_model.movies, py_model.movies, rtol=1e-04)
 
 def test_svd_update_user_and_movie_modifies_matrices_as_expected():
     from utils.data_io import get_user_movie_time_rating
