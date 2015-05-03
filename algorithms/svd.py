@@ -21,6 +21,7 @@ class SVD(Model):
         self.users = np.array([])
         self.movies = np.array([])
         self.train_points = np.array([])
+        self.stats = None
         self.max_user = 0
         self.max_movie = 0
         self.debug = False
@@ -33,7 +34,8 @@ class SVD(Model):
         return np.amax(self.train_points[:, USER_INDEX]) + 1
 
     def calculate_prediction(self, user, movie):
-        return np.dot(self.users[user, :], self.movies[movie, :])
+        return self.stats.get_baseline(user=user, movie=movie) + np.dot(
+            self.users[user, :], self.movies[movie, :])
 
     def calculate_prediction_error(self, user, movie, rating):
         return rating - self.calculate_prediction(user, movie)
@@ -57,8 +59,12 @@ class SVD(Model):
     def set_train_points(self, train_points):
         self.train_points = train_points
 
-    def train(self, train_points, epochs=1):
+    def set_stats(self, stats):
+        self.stats = stats
+
+    def train(self, train_points, stats, epochs=1):
         self.set_train_points(train_points)
+        self.set_stats(stats)
         self.initialize_users_and_movies()
         for epoch in range(epochs):
             if self.debug:

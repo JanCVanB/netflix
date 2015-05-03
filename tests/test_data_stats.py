@@ -11,6 +11,25 @@ def make_simple_test_set():
     return test_data_set
 
 
+def make_simple_stats():
+    from utils.data_stats import DataStats
+    stats = DataStats()
+    stats.load_data_set(data_set=make_simple_test_set())
+    stats.compute_movie_stats()
+    stats.compute_user_stats()
+    return stats
+
+
+def test_get_baseline_returns_expected_baseline():
+    stats = make_simple_stats()
+    user_id = 1
+    movie_id = 1
+    # Baseline (according to funny) = avg_movie_rating[movie] + avg_user_offset[user]
+    test_baseline = stats.get_baseline(user=user_id, movie=movie_id)
+    expected_baseline = 11/3 + (4-11/3)
+    assert test_baseline == expected_baseline
+
+
 def get_test_set_stats():
     test_set = make_simple_test_set()
     test_movie_averages = np.array([4, 11/3], dtype=np.float32)  # (3+5)/2, (5+4+2)/3])
@@ -145,4 +164,5 @@ def test_load_stats_from_file_loads_correct_data():
                                   expected_user_offsets)
     np.testing.assert_array_equal(stats.user_rating_count,
                                   expected_user_rating_count)
+
 

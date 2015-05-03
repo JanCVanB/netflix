@@ -62,6 +62,9 @@ class DataStats():
                                                             np.isnan(self.user_offsets)))
         self.user_offsets[np.isnan(self.user_offsets)] = average_of_all_offsets
 
+    def get_baseline(self, user, movie):
+        return self.movie_averages[movie] + self.user_offsets[user]
+
     def write_stats_to_file(self, file_path):
         pickle.dump(self, file=open(file_path, 'wb'))
 

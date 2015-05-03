@@ -5,6 +5,7 @@ from time import localtime, strftime
 
 sys.path.append(abspath(dirname(dirname(__file__))))
 from utils.data_io import load_numpy_array_from_file
+from utils.data_stats import load_stats_from_file
 from utils.data_paths import DATA_DIR_PATH, RESULTS_DIR_PATH
 
 
@@ -25,9 +26,10 @@ def run(model, train_set_name, test_set_name, epochs=None, features=None):
     model.debug = True
     train_points = load_numpy_array_from_file(train_file_path)
     times = strftime(time_format, localtime())
-    model.train(train_points, epochs)
+    model.train(train_points, epochs, stats=stats)
     times += '_to_' + strftime(time_format, localtime())
     model.train_points = None
+    model.stats = None
 
     epochs_string = '' if epochs is None else ('_%sepochs' % epochs)
     features_string = '' if features is None else ('_%sfeatures' % features)

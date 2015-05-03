@@ -12,7 +12,9 @@ MockThatTracksCallsWithoutRunning = Mock
 
 def initialize_model_with_simple_train_points_but_do_not_train(model):
     simple_train_points = make_simple_train_points()
+    simple_stats = make_simple_stats()
     model.set_train_points(simple_train_points)
+    model.set_stats(simple_stats)
     model.initialize_users_and_movies()
 
 
@@ -33,6 +35,15 @@ def make_simple_train_points():
                      (1, 3, 0, 1),
                      (5, 2, 0, 2))
     return np.array(train_ratings, dtype=np.int32)
+
+
+def make_simple_stats():
+    from utils.data_stats import DataStats
+    stats = DataStats()
+    stats.load_data_set(data_set=make_simple_train_points())
+    stats.compute_movie_stats()
+    stats.compute_user_stats()
+    return stats
 
 
 def test_svd_calculate_max_movie_returns_expected_number():
@@ -64,14 +75,17 @@ def test_svd_calculate_prediction_error_returns_expected_error():
 
 def test_svd_calculate_prediction_returns_expected_prediction():
     from utils.data_io import get_user_movie_time_rating
+    from utils.data_stats import DataStats
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
-    model.train(simple_train_points)
+    simple_stats = make_simple_stats()
+    model.train(simple_train_points, stats=simple_stats)
     simple_test_points = make_simple_test_points()
+    simple_stats = make_simple_stats()
     for test_point in simple_test_points:
         user, movie, _, _ = get_user_movie_time_rating(test_point)
-        expected_prediction = np.dot(model.users[user, :],
-                                     model.movies[movie, :])
+        expected_prediction = simple_stats.get_baseline(user, movie)  + np.dot(
+            model.users[user, :], model.movies[movie, :])
         actual_prediction = model.calculate_prediction(user, movie)
         assert actual_prediction == expected_prediction
 
@@ -223,28 +237,33 @@ def test_svd_set_train_points_sets_train_points_to_expected_matrix():
 def test_svd_train_initializes_user_and_movie_feature_matrices():
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
+    simple_stats = make_simple_stats()
     model.update_all_features = MockThatAvoidsLongRunTime()
     model.initialize_users_and_movies = MockThatTracksCallsWithoutRunning()
-    model.train(simple_train_points)
+    model.train(simple_train_points, stats=simple_stats)
     assert model.initialize_users_and_movies.call_count == 1
 
 
-def test_svd_train_sets_train_points():
+def test_svd_train_sets_train_points_and_stats():
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
+    simple_stats = make_simple_stats()
     model.initialize_users_and_movies = MockThatAvoidsErrors()
     model.update_all_features = MockThatAvoidsLongRunTime()
     model.set_train_points = MockThatTracksCallsWithoutRunning()
-    model.train(simple_train_points)
+    model.set_stats = MockThatTracksCallsWithoutRunning()
+    model.train(simple_train_points, stats=simple_stats)
     assert model.set_train_points.call_count == 1
+    assert model.set_stats.call_count == 1
 
 
 def test_svd_train_updates_all_features_the_expected_number_of_times():
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
+    simple_stats = make_simple_stats()
     number_of_epochs = 3
     model.update_all_features = MockThatTracksCallsWithoutRunning()
-    model.train(simple_train_points, epochs=number_of_epochs)
+    model.train(simple_train_points, stats=simple_stats, epochs=number_of_epochs)
     assert model.update_all_features.call_count == number_of_epochs
 
 
@@ -315,6 +334,10 @@ def test_svd_update_feature_in_c_modifies_users_and_movies_as_expected():
         py_model.update_feature(feature)
         np.testing.assert_array_equal(c_model.users, py_model.users)
         np.testing.assert_array_equal(c_model.movies, py_model.movies)
+
+
+def test_implement_baseline_in_c():
+    raise Exception('TODO.')
 
 
 def test_svd_update_user_and_movie_modifies_matrices_as_expected():
