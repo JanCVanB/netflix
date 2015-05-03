@@ -338,3 +338,5 @@ def test_svd_update_user_and_movie_modifies_matrices_as_expected():
             actual_movies = model.movies
             np.testing.assert_array_equal(actual_users, expected_users)
             np.testing.assert_array_equal(actual_movies, expected_movies)
+
+

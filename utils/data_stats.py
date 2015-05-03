@@ -1,6 +1,8 @@
 import numpy as np
+import pickle
 from utils.constants import USER_INDEX, MOVIE_INDEX
 from utils.data_io import get_user_movie_time_rating
+
 
 class DataStats():
     def load_data_set(self, data_set):
@@ -34,9 +36,9 @@ class DataStats():
                     self.movie_rating_count[movie_id]
             else:
                 self.movie_averages[movie_id] = np.nan
-        self.average_of_all_ratings = np.mean(np.ma.masked_array(self.movie_averages,
+        self.average_of_all_movies = np.mean(np.ma.masked_array(self.movie_averages,
                                                            np.isnan(self.movie_averages)))
-        self.movie_averages[np.isnan(self.movie_averages)] = self.average_of_all_ratings
+        self.movie_averages[np.isnan(self.movie_averages)] = self.average_of_all_movies
 
     def compute_user_stats(self):
         if self.movie_averages == []:
@@ -60,6 +62,12 @@ class DataStats():
                                                             np.isnan(self.user_offsets)))
         self.user_offsets[np.isnan(self.user_offsets)] = average_of_all_offsets
 
+    def write_stats_to_file(self, file_path):
+        pickle.dump(self, file=open(file_path, 'wb'))
 
 
+def load_stats_from_file(file_path):
+    pickle_file = open(file_path, 'rb')
+    stats_object =  pickle.load(pickle_file)
+    return stats_object
 
