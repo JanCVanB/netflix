@@ -66,6 +66,13 @@ class SVD(Model):
         for epoch in range(epochs):
             if self.debug:
                 print('Epoch #{}'.format(epoch + 1))
+                print('movies: {}'.format(self.movies))
+                print('users: {}'.format(self.users))
+                self.movies[0, 0] = np.nan
+                if np.isnan(np.sum(self.movies)) or np.isnan(np.sum(self.users)):
+                    print("So, I found a NaN..")
+                    import pdb
+                    pdb.set_trace()
             self.update_all_features()
 
     def train_more(self, train_points=None, epochs=1):
