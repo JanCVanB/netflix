@@ -31,7 +31,6 @@ def run(model, train_set_name, test_set_name, epochs=None, features=None):
     model.train(train_points, stats=stats, epochs=epochs)
     times += '_to_' + strftime(time_format, localtime())
     model.train_points = None
-    model.stats = None
 
     epochs_string = '' if epochs is None else ('_%sepochs' % epochs)
     features_string = '' if features is None else ('_%sfeatures' % features)
