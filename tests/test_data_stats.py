@@ -106,7 +106,6 @@ def create_test_stats_file(file_path):
     stats.average_of_all_movies = np.mean(movie_averages)
     stats.num_users = np.amax(test_set[:, USER_INDEX]) + 1
     stats.num_movies = np.amax(test_set[:, MOVIE_INDEX]) + 1
-    stats.data_set = []
     stats.write_stats_to_file(file_path=file_path)
 
 
@@ -123,8 +122,6 @@ def test_saved_stats_file_does_not_contain_the_raw_data_set():
     except ValueError:
         raise Exception('Expected empty data_set in saved stats file.')
     
-    
-
 
 def test_save_stats_to_file_creates_a_file():
     from utils.data_paths import DATA_DIR_PATH
@@ -153,5 +150,3 @@ def test_load_stats_from_file_loads_correct_data():
                                   expected_user_offsets)
     np.testing.assert_array_equal(stats.user_rating_count,
                                   expected_user_rating_count)
-
-

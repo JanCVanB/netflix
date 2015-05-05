@@ -66,6 +66,7 @@ class DataStats():
         return self.movie_averages[movie] + self.user_offsets[user]
 
     def write_stats_to_file(self, file_path):
+        self.data_set = []
         pickle.dump(self, file=open(file_path, 'wb'))
 
 
