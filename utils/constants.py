@@ -27,5 +27,5 @@ RATING_INDEX = 3
 """Index of rating in data point tuple for all data point arrays"""
 
 
-ALGORITHM_DEFAULT_PREDICTION_INITIAL = 3
+SVD_FEATURE_VALUE_INITIAL = 0.01
 """Default value for initial algorithm predictions"""

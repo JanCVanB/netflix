@@ -5,19 +5,16 @@ from time import time
 
 from algorithms.model import Model
 from utils.c_interface import c_svd_update_feature
-from utils.constants import ALGORITHM_DEFAULT_PREDICTION_INITIAL
+from utils.constants import SVD_FEATURE_VALUE_INITIAL
 from utils.constants import MOVIE_INDEX, USER_INDEX
 from utils.data_io import get_user_movie_time_rating
 
 
 class SVD(Model):
-    def __init__(self, learn_rate=0.001, num_features=3, feature_initial=None):
+    def __init__(self, learn_rate=0.001, num_features=3, feature_initial=SVD_FEATURE_VALUE_INITIAL):
         self.learn_rate = learn_rate
         self.num_features = num_features
         self.feature_initial = feature_initial
-        if self.feature_initial is None:
-            self.feature_initial = sqrt(ALGORITHM_DEFAULT_PREDICTION_INITIAL /
-                                        self.num_features)
         self.users = np.array([])
         self.movies = np.array([])
         self.train_points = np.array([])

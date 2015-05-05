@@ -121,23 +121,19 @@ def test_svd_init_sets_custom_number_of_features():
 
 
 def test_svd_init_sets_default_feature_initial_value_for_custom_number():
-    from math import sqrt
     from random import random
-    from utils.constants import ALGORITHM_DEFAULT_PREDICTION_INITIAL
+    from utils.constants import SVD_FEATURE_VALUE_INITIAL
     custom_number_of_features = random()
-    expected_feature_initial = sqrt(ALGORITHM_DEFAULT_PREDICTION_INITIAL /
-                                    custom_number_of_features)
+    expected_feature_initial = SVD_FEATURE_VALUE_INITIAL
     model = svd.SVD(num_features=custom_number_of_features)
     actual_feature_initial = model.feature_initial
     assert float(actual_feature_initial) == expected_feature_initial
 
 
 def test_svd_init_sets_default_feature_initial_value_for_default_number():
-    from math import sqrt
-    from utils.constants import ALGORITHM_DEFAULT_PREDICTION_INITIAL
+    from utils.constants import SVD_FEATURE_VALUE_INITIAL
     default_num_features = 3
-    expected_feature_initial = sqrt(ALGORITHM_DEFAULT_PREDICTION_INITIAL /
-                                    default_num_features)
+    expected_feature_initial = SVD_FEATURE_VALUE_INITIAL
     model = svd.SVD()
     actual_feature_initial = model.feature_initial
     assert float(actual_feature_initial) == expected_feature_initial
@@ -174,10 +170,12 @@ def test_svd_initialize_users_and_movies_sets_expected_users_movies_matrices():
     model.set_train_points(simple_train_points)
     num_users = model.calculate_max_user()
     num_movies = model.calculate_max_movie()
-    expected_users = np.full((num_users, model.num_features),
-                             model.feature_initial, dtype=np.int32)
-    expected_movies = np.full((num_movies, model.num_features),
-                              model.feature_initial, dtype=np.int32)
+    feature_initial = model.feature_initial
+    num_features = model.num_features
+    expected_users = np.full((num_users, num_features),
+                             feature_initial, dtype=np.float32)
+    expected_movies = np.full((num_movies, num_features),
+                              feature_initial, dtype=np.float32)
     model.initialize_users_and_movies()
     actual_users = model.users
     actual_movies = model.movies
