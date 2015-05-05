@@ -119,8 +119,8 @@ class SVD(Model):
             self.update_user_and_movie(user, movie, feature, error)
 
     def update_feature_in_c(self, feature):
-        c_svd_update_feature(self.train_points, self.users, self.movies,
-                             feature, self.num_features, self.learn_rate)
+        c_svd_update_feature(self.train_points, self.users, self.stats.user_offsets, self.movies,
+                             self.stats.movie_averages, feature, self.num_features, self.learn_rate)
 
     def update_user_and_movie(self, user, movie, feature, error):
         user_change = self.learn_rate * error * self.movies[movie, feature]

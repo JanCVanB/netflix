@@ -331,12 +331,8 @@ def test_svd_update_feature_in_c_modifies_users_and_movies_as_expected():
     for feature in range(c_model.num_features):
         c_model.update_feature_in_c(feature)
         py_model.update_feature(feature)
-        np.testing.assert_array_equal(c_model.users, py_model.users)
-        np.testing.assert_array_equal(c_model.movies, py_model.movies)
-
-
-def test_implement_baseline_in_c():
-    raise Exception('TODO.')
+        np.testing.assert_array_almost_equal(c_model.users, py_model.users, decimal=7)
+        np.testing.assert_array_almost_equal(c_model.movies, py_model.movies, decimal=7)
 
 
 def test_svd_update_user_and_movie_modifies_matrices_as_expected():

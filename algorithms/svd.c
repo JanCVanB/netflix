@@ -1,5 +1,5 @@
-int c_update_feature(int *train_points, int num_points, float *users, 
-        int num_users, float *movies, int num_movies, float learn_rate, 
+int c_update_feature(int *train_points, int num_points, float *users, float *user_offsets,
+        int num_users, float *movies, float *movie_averages, int num_movies, float learn_rate, 
         int feature, int num_features){
 
 	int p, f;
@@ -20,7 +20,8 @@ int c_update_feature(int *train_points, int num_points, float *users,
 		/* TODO: Use residuals to avoid repeat dot product calculations */
 		user_features  = users + (*user * num_features);
 		movie_features = movies + (*movie * num_features);
-        prediction = 0;
+        // Calculate prediction using baseline
+        prediction = user_offsets[*user] + movie_averages[*movie];
 		for(f = 0; f < num_features; f++){
 			prediction += user_features[f] * movie_features[f];
 		}
@@ -36,6 +37,8 @@ int c_update_feature(int *train_points, int num_points, float *users,
 	}
     return 0;
 }
+
+
 int c_update_feature_with_pointers(int *train_points, int num_points, float *users,
         int num_users, float *movies, int num_movies, float learn_rate,
         int feature, int num_features){
@@ -81,6 +84,7 @@ int c_update_feature_with_pointers(int *train_points, int num_points, float *use
 	}
     return 0;
 }
+
 
 int c_update_feature_with_residuals(int *train_points, int num_points, float *users,
         int num_users, float *movies, int num_movies, float *residuals, float learn_rate,
@@ -135,3 +139,4 @@ int c_update_feature_with_residuals(int *train_points, int num_points, float *us
 	}
     return 0;
 }
+
