@@ -31,7 +31,6 @@ def test_get_baseline_returns_expected_baseline():
 
 
 def get_test_set_stats():
-    test_set = make_simple_test_set()
     test_movie_averages = np.array([4, 11/3], dtype=np.float32)  # (3+5)/2, (5+4+2)/3])
     test_movie_rating_count = np.array([2, 3], dtype=np.int32)
     test_user_offsets = np.array([((5-11/3)+(3-4))/2,  # User 0:  (5-11/3  +  3-4)/2
@@ -66,7 +65,7 @@ def test_compute_movie_stats_creates_numpy_array():
     stats.compute_movie_stats()
     np.testing.assert_almost_equal(stats.movie_averages, expected_movie_averages)
     np.testing.assert_almost_equal(stats.movie_rating_count,
-                                  expected_movie_rating_count)
+                                   expected_movie_rating_count)
 
 
 def test_computer_user_stats_creates_numpy_array():
@@ -137,23 +136,13 @@ def test_save_stats_to_file_creates_a_file():
  
 
 def test_load_stats_from_file_loads_correct_data():
-    from utils.data_stats import DataStats
     from utils.data_stats import load_stats_from_file
-    from utils.constants import MOVIE_INDEX, USER_INDEX
     from utils.data_paths import DATA_DIR_PATH
     import os
     file_name = 'test_stats.p'
     file_path = os.path.join(DATA_DIR_PATH, file_name)
-    stats = load_stats_from_file(file_path=file_path)
     expected_movie_averages, expected_movie_rating_count, \
-    expected_user_offsets, expected_user_rating_count = get_test_set_stats()
-#    stats.movie_averages = movie_averages
-#    stats.movie_rating_count = movie_rating_count
-#    stats.user_offset = user_offsets
-#    stats.user_rating_count = user_rating_count
-#    stats.average_of_all_movies = np.mean(movie_averages)
-#    stats.num_users = np.amax(test_set[:, USER_INDEX]) + 1
-#    stats.num_movies = np.amax(test_set[:, MOVIE_INDEX]) + 1
+        expected_user_offsets, expected_user_rating_count = get_test_set_stats()
     stats = load_stats_from_file(file_path=file_path)
     print(dir(stats))
     np.testing.assert_array_equal(stats.movie_averages,

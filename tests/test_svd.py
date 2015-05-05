@@ -75,7 +75,6 @@ def test_svd_calculate_prediction_error_returns_expected_error():
 
 def test_svd_calculate_prediction_returns_expected_prediction():
     from utils.data_io import get_user_movie_time_rating
-    from utils.data_stats import DataStats
     model = svd.SVD()
     simple_train_points = make_simple_train_points()
     simple_stats = make_simple_stats()
@@ -84,7 +83,7 @@ def test_svd_calculate_prediction_returns_expected_prediction():
     simple_stats = make_simple_stats()
     for test_point in simple_test_points:
         user, movie, _, _ = get_user_movie_time_rating(test_point)
-        expected_prediction = simple_stats.get_baseline(user, movie)  + np.dot(
+        expected_prediction = simple_stats.get_baseline(user, movie) + np.dot(
             model.users[user, :], model.movies[movie, :])
         actual_prediction = model.calculate_prediction(user, movie)
         assert actual_prediction == expected_prediction
@@ -361,5 +360,3 @@ def test_svd_update_user_and_movie_modifies_matrices_as_expected():
             actual_movies = model.movies
             np.testing.assert_array_equal(actual_users, expected_users)
             np.testing.assert_array_equal(actual_movies, expected_movies)
-
-

@@ -14,7 +14,7 @@ class DataStats():
         self.data_set = []
         self.num_users = None
         self.num_movies = None
-        self.average_of_all_ratings = None
+        self.average_of_all_movies = None
         self.movie_averages = []
         self.movie_rating_count = []
         self.user_offsets = []
@@ -37,7 +37,7 @@ class DataStats():
             else:
                 self.movie_averages[movie_id] = np.nan
         self.average_of_all_movies = np.mean(np.ma.masked_array(self.movie_averages,
-                                                           np.isnan(self.movie_averages)))
+                                             np.isnan(self.movie_averages)))
         self.movie_averages[np.isnan(self.movie_averages)] = self.average_of_all_movies
 
     def compute_user_stats(self):
@@ -71,6 +71,6 @@ class DataStats():
 
 def load_stats_from_file(file_path):
     pickle_file = open(file_path, 'rb')
-    stats_object =  pickle.load(pickle_file)
+    stats_object = pickle.load(pickle_file)
     return stats_object
 
