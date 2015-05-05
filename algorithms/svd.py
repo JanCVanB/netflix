@@ -68,7 +68,6 @@ class SVD(Model):
                 print('Epoch #{}'.format(epoch + 1))
                 print('movies: {}'.format(self.movies))
                 print('users: {}'.format(self.users))
-                self.movies[0, 0] = np.nan
                 if np.isnan(np.sum(self.movies)) or np.isnan(np.sum(self.users)):
                     print("So, I found a NaN..")
                     import pdb
