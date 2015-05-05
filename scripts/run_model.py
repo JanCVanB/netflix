@@ -22,11 +22,13 @@ def run(model, train_set_name, test_set_name, epochs=None, features=None):
         print('Number of features:', features)
     time_format = '%b-%d-%Hh-%Mm'
     train_file_path = join(DATA_DIR_PATH, train_set_name + '.npy')
+    stats_file_path = join(DATA_DIR_PATH, train_set_name + '_stats.p')
 
     model.debug = True
     train_points = load_numpy_array_from_file(train_file_path)
+    stats = load_stats_from_file(stats_file_path)
     times = strftime(time_format, localtime())
-    model.train(train_points, epochs, stats=stats)
+    model.train(train_points, stats=stats, epochs=epochs)
     times += '_to_' + strftime(time_format, localtime())
     model.train_points = None
     model.stats = None
@@ -65,7 +67,9 @@ def run_multi(model, train_set_name, test_set_name, epochs=None, features=None):
         print('Number of features:', features)
 
     train_file_path = join(DATA_DIR_PATH, train_set_name + '.npy')
+    stats_file_path = join(DATA_DIR_PATH, train_set_name + '_stats.p')
     train_points = load_numpy_array_from_file(train_file_path)
+    stats = load_stats_from_file(stats_file_path)
     test_file_path = join(DATA_DIR_PATH, test_set_name + '.npy')
     test_points = load_numpy_array_from_file(test_file_path)
 
@@ -81,7 +85,7 @@ def run_multi(model, train_set_name, test_set_name, epochs=None, features=None):
     for epoch in range(epochs):
         print('Training epoch {}:'.format(epoch))
         if epoch == 0:
-            model.train(train_points, epochs=1)
+            model.train(train_points, epochs=1, stats=stats)
         else:
             model.train_more(epochs=1)
         print('Predicting "{test}" ratings'.format(test=test_set_name))
