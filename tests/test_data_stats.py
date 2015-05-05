@@ -68,7 +68,7 @@ def test_compute_movie_stats_creates_numpy_array():
                                    expected_movie_rating_count)
 
 
-def test_computer_user_stats_creates_numpy_array():
+def test_compute_user_stats_creates_numpy_array():
     from utils.data_stats import DataStats
     stats = DataStats()
     test_set = make_simple_test_set()

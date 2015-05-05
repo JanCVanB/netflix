@@ -80,7 +80,6 @@ def test_svd_calculate_prediction_returns_expected_prediction():
     simple_stats = make_simple_stats()
     model.train(simple_train_points, stats=simple_stats)
     simple_test_points = make_simple_test_points()
-    simple_stats = make_simple_stats()
     for test_point in simple_test_points:
         user, movie, _, _ = get_user_movie_time_rating(test_point)
         expected_prediction = simple_stats.get_baseline(user, movie) + np.dot(
