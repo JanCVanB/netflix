@@ -57,7 +57,8 @@ class SVD(Model):
 
     def set_train_points(self, train_points):
         self.train_points = train_points
-        self.residuals = np.full(self.train_points.shape[0],0, dtype=np.float32)
+        num_train_points = train_points.shape[0] + 1
+        self.residuals = np.zeros(num_train_points, dtype=np.float32)
 
     def train(self, train_points, epochs=1):
         self.set_train_points(train_points)
@@ -80,7 +81,7 @@ class SVD(Model):
             if self.debug:
                 print('  Feature #{}'.format(feature + 1))
             if self.run_c:
-                self.update_feature_in_c(feature)
+                self.update_feature_in_c_with_residuals(feature)
             else:
                 self.update_feature(feature)
 
