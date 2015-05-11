@@ -81,7 +81,7 @@ class SVD(Model):
             if self.debug:
                 print('  Feature #{}'.format(feature + 1))
             if self.run_c:
-                self.update_feature_in_c_with_residuals(feature)
+                self.update_feature_in_c(feature)
             else:
                 self.update_feature(feature)
 
