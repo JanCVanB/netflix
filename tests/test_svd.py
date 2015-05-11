@@ -331,6 +331,34 @@ def test_svd_update_feature_in_c_modifies_users_and_movies_as_expected():
         np.testing.assert_array_almost_equal(c_model.users, py_model.users, decimal=7)
         np.testing.assert_array_almost_equal(c_model.movies, py_model.movies, decimal=7)
 
+def test_svd_update_feature_in_c_with_pointers_modifies_users_and_movies_as_expected():
+    c_model = svd.SVD()
+    py_model = svd.SVD()
+    initialize_model_with_simple_train_points_but_do_not_train(c_model)
+    initialize_model_with_simple_train_points_but_do_not_train(py_model)
+    np.testing.assert_array_equal(c_model.train_points, py_model.train_points)
+    np.testing.assert_array_equal(c_model.users, py_model.users)
+    np.testing.assert_array_equal(c_model.movies, py_model.movies)
+    for feature in range(c_model.num_features):
+        c_model.update_feature_in_c_with_pointers(feature)
+        py_model.update_feature(feature)
+        np.testing.assert_array_equal(c_model.users, py_model.users)
+        np.testing.assert_array_equal(c_model.movies, py_model.movies)
+
+
+def test_svd_update_feature_in_c_with_residuals_modifies_users_and_movies_as_expected():
+    c_model = svd.SVD()
+    py_model = svd.SVD()
+    initialize_model_with_simple_train_points_but_do_not_train(c_model)
+    initialize_model_with_simple_train_points_but_do_not_train(py_model)
+    np.testing.assert_array_equal(c_model.train_points, py_model.train_points)
+    np.testing.assert_array_equal(c_model.users, py_model.users)
+    np.testing.assert_array_equal(c_model.movies, py_model.movies)
+    for feature in range(c_model.num_features):
+        c_model.update_feature_in_c_with_residuals(feature)
+        py_model.update_feature(feature)
+        np.testing.assert_allclose(c_model.users, py_model.users, rtol=1e-04)
+        np.testing.assert_allclose(c_model.movies, py_model.movies, rtol=1e-04)
 
 def test_svd_update_user_and_movie_modifies_matrices_as_expected():
     from utils.data_io import get_user_movie_time_rating

@@ -17,6 +17,7 @@ class SVD(Model):
         self.feature_initial = feature_initial
         self.users = np.array([])
         self.movies = np.array([])
+        self.residuals = np.array([])
         self.train_points = np.array([])
         self.stats = None
         self.max_user = 0
@@ -55,6 +56,8 @@ class SVD(Model):
 
     def set_train_points(self, train_points):
         self.train_points = train_points
+        num_train_points = train_points.shape[0] + 1
+        self.residuals = np.zeros(num_train_points, dtype=np.float32)
 
     def set_stats(self, stats):
         self.stats = stats
@@ -122,10 +125,11 @@ class SVD(Model):
             self.update_user_and_movie(user, movie, feature, error)
 
     def update_feature_in_c(self, feature):
-        c_svd_update_feature(self.train_points,
-                             self.users, self.stats.user_offsets,
-                             self.movies, self.stats.movie_averages,
-                             feature, self.num_features, self.learn_rate)
+        c_svd_update_feature(train_points=self.train_points,
+                             users=self.users, user_offsets=self.stats.user_offsets,
+                             movies=self.movies, movie_averages=self.stats.movie_averages,
+                             residuals=self.residuals, feature=feature,
+                             num_features=self.num_features, learn_rate=self.learn_rate)
 
     def update_user_and_movie(self, user, movie, feature, error):
         user_change = self.learn_rate * error * self.movies[movie, feature]

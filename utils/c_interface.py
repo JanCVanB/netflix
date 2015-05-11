@@ -14,9 +14,10 @@ class CException(Exception):
             return '{}. (Error {})'.format(self.message, self.err_no)
 
 
-def c_svd_update_feature(train_points, users, user_offsets, movies, movie_averages,
-                         feature, num_features, learn_rate):
+def c_svd_update_feature(train_points, users, user_offsets, movies, residuals,
+                         movie_averages, feature, num_features, learn_rate):
     import ctypes
+    from ctypes import c_void_p, c_int32, c_float
     import os
     from utils.data_paths import LIBRARY_DIR_PATH
     num_train_points = train_points.shape[0]
@@ -25,19 +26,23 @@ def c_svd_update_feature(train_points, users, user_offsets, movies, movie_averag
     library_file_name = 'svd.so'
     library_file_path = os.path.join(LIBRARY_DIR_PATH, library_file_name)
     svd_lib = ctypes.cdll.LoadLibrary(library_file_path)
+#    svd_lib.c_update_feature.argtypes = [c_void_p, c_int32, c_void_p, c_void_p, c_int32, c_void_p,
+#                                         c_void_p, c_int32, c_void_p, c_float, c_int32, c_int32]
+#    svd_lib.c_update_feature.restype = c_int32
     c_update_feature = svd_lib.c_update_feature
     returned_value = c_update_feature(
-        ctypes.c_void_p(train_points.ctypes.data),    # (void*) train_points
-        ctypes.c_int32(num_train_points),             # (int)   num_train_points
-        ctypes.c_void_p(users.ctypes.data),           # (void*) users
-        ctypes.c_void_p(user_offsets.ctypes.data),    # (void*) user_offsets
-        ctypes.c_int32(num_users),                    # (int)   num_users
-        ctypes.c_void_p(movies.ctypes.data),          # (void*) movies
-        ctypes.c_void_p(movie_averages.ctypes.data),  # (void*) movie_averages
-        ctypes.c_int32(num_movies),                   # (int)   num_movies
-        ctypes.c_float(learn_rate),                   # (float) learn_rate
-        ctypes.c_int32(feature),                      # (int)   feature
-        ctypes.c_int32(num_features)                  # (int)   num_features
+        c_void_p(train_points.ctypes.data),    # (void*) train_points
+        c_int32(num_train_points),             # (int)   num_train_points
+        c_void_p(users.ctypes.data),           # (void*) users
+        c_void_p(user_offsets.ctypes.data),    # (void*) user_offsets
+        c_int32(num_users),                    # (int)   num_users
+        c_void_p(movies.ctypes.data),          # (void*) movies
+        c_void_p(movie_averages.ctypes.data),  # (void*) movie_averages
+        c_int32(num_movies),                   # (int)   num_movies
+        c_void_p(residuals.ctypes.data),       # (void*) residuals
+        c_float(learn_rate),                   # (float) learn_rate
+        c_int32(feature),                      # (int)   feature
+        c_int32(num_features)                  # (int)   num_features
     )
     if returned_value != 0:
         raise CException(returned_value)
