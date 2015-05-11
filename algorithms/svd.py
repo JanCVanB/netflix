@@ -117,7 +117,7 @@ class SVD(Model):
 
     def update_feature_in_c(self, feature):
         c_svd_update_feature(self.train_points, self.users, self.movies,
-                             feature, self.num_features, self.learn_rate)
+                             self.residuals, feature, self.num_features, self.learn_rate)
 
     def update_feature_in_c_with_pointers(self, feature):
         c_svd_update_feature_with_pointers(self.train_points, self.users, self.movies,
