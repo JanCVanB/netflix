@@ -15,7 +15,7 @@ class CException(Exception):
 
 
 def c_svd_update_feature(train_points, users, user_offsets, movies, residuals,
-                         movie_averages, feature, num_features, learn_rate):
+                         movie_averages, feature, num_features, learn_rate, k_factor):
     import ctypes
     from ctypes import c_void_p, c_int32, c_float
     import os
@@ -42,7 +42,8 @@ def c_svd_update_feature(train_points, users, user_offsets, movies, residuals,
         c_void_p(residuals.ctypes.data),       # (void*) residuals
         c_float(learn_rate),                   # (float) learn_rate
         c_int32(feature),                      # (int)   feature
-        c_int32(num_features)                  # (int)   num_features
+        c_int32(num_features),                 # (int)   num_features
+        c_float(k_factor)                      # (float) k_factor
     )
     if returned_value != 0:
         raise CException(returned_value)

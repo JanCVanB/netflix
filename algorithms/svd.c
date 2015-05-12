@@ -2,7 +2,7 @@
 
 int c_update_feature(int *train_points, int num_points, float *users, float *user_offsets,
         int num_users, float *movies, float* movie_averages, int num_movies, float *residuals,
-        float learn_rate, int feature, int num_features)
+        float learn_rate, int feature, int num_features, float k_factor)
 {
 
 	int p, f;
@@ -30,24 +30,32 @@ int c_update_feature(int *train_points, int num_points, float *users, float *use
 		feature_product = user_features[feature]*movie_features[feature];
 		if(feature == 0){
        		 for(f = 0; f < num_features; f++){
-	                prediction += *user_features_cursor * *movie_features_cursor;
+       		        prediction += *user_features_cursor * *movie_features_cursor;
+       		        if(prediction > 5){
+       		            prediction = 5;
+       		        }else if(prediction < 1){
+       		            prediction = 1;
+       		        }
+
         	        user_features_cursor++;
                		movie_features_cursor++;
                   }
-                 // if(p ==  0 || p == num_points-1){
-               	 //	printf("Feature number %d\n", feature);
-              	  //}
 
 		}else{
 		    prediction  = residuals[p];
 		    prediction += user_features[feature-1]*movie_features[feature-1];
-            //feature_product = user_features[feature]*movie_features[feature];
+            if(prediction > 5){ /* Clip ratings */
+                prediction = 5;
+            }else if(prediction < 1){
+                prediction = 1;
+            }
+
 		    prediction += feature_product;
-		    //if(p == 0 || p == num_points-1){
-                    //    printf("First prediction with residual:  %f\n", prediction);
-		    //	printf("Last/first previous user features: %f, movie features: %f\n",
-		    //		user_features[feature-1],movie_features[feature-1]);
-		    //	}
+            if(prediction > 5){ /* Clip again */
+                prediction = 5;
+            }else if(prediction < 1){
+                prediction = 1;
+            }
 		}
 		
 		error = ((float) *rating) - prediction;
@@ -56,8 +64,8 @@ int c_update_feature(int *train_points, int num_points, float *users, float *use
 		movie_features_cursor = &movie_features[feature];
 
 		/* Update user and movie */
-		user_change  = learn_rate * error * *movie_features_cursor;
-		movie_change = learn_rate * error * *user_features_cursor;
+		user_change  = learn_rate * (error * *movie_features_cursor - k_factor * *user_features_cursor);
+		movie_change = learn_rate * (error * *user_features_cursor - k_factor * *movie_features_cursor);
 
 
 		*user_features_cursor  += user_change;
