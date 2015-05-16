@@ -11,10 +11,11 @@ from utils.data_io import get_user_movie_time_rating
 
 
 class SVD(Model):
-    def __init__(self, learn_rate=0.001, num_features=3, feature_initial=SVD_FEATURE_VALUE_INITIAL):
+    def __init__(self, learn_rate=0.001, num_features=3, feature_initial=SVD_FEATURE_VALUE_INITIAL, k_factor=0.02):
         self.learn_rate = learn_rate
         self.num_features = num_features
         self.feature_initial = feature_initial
+        self.k_factor = k_factor
         self.users = np.array([])
         self.movies = np.array([])
         self.residuals = np.array([])
@@ -129,7 +130,7 @@ class SVD(Model):
                              users=self.users, user_offsets=self.stats.user_offsets,
                              movies=self.movies, movie_averages=self.stats.movie_averages,
                              residuals=self.residuals, feature=feature,
-                             num_features=self.num_features, learn_rate=self.learn_rate)
+                             num_features=self.num_features, learn_rate=self.learn_rate, k_factor=self.k_factor)
 
     def update_user_and_movie(self, user, movie, feature, error):
         user_change = self.learn_rate * error * self.movies[movie, feature]
