@@ -40,28 +40,35 @@ class DataStats():
 
     def compute_movie_stats(self):
         simple_sum, simple_count = compute_simple_indexed_sum_and_count(
-            data_values=self.data_set[:, MOVIE_INDEX],
-            data_indices=self.data_set[:, RATING_INDEX]
+            data_values=self.data_set[:, RATING_INDEX],
+            data_indices=self.data_set[:, MOVIE_INDEX]
             )
+        print('Simples: {} {}'.format(simple_sum, simple_count))
         global_average = compute_global_average_rating(data_set=self.data_set)
+        print('global: {}'.format(global_average))
         self.movie_averages = compute_blended_indexed_averages(
             simple_sum=simple_sum,
             simple_count=simple_count,
             global_average=global_average
             )
+        print('Avgs: {}'.format(self.movie_averages))
         self.movie_rating_count = simple_count
         self.movie_rating_sum = simple_sum
         self.global_average = global_average
 
     def compute_user_stats(self):
+        simple_offsets = compute_offsets(
+            data_indices=self.data_set[:, MOVIE_INDEX],
+            data_values=self.data_set[:, RATING_INDEX],
+            averages=self.movie_averages)
         simple_sum, simple_count = compute_simple_indexed_sum_and_count(
             data_indices=self.data_set[:, USER_INDEX],
-            data_values=self.data_set[:, RATING_INDEX],
-            averages=self.movie_averages,
-            averages_indices=self.data_set[:, MOVIE_INDEX]
+            data_values=simple_offsets,
         )
-        simple_count[simple_count == 0] = 1  # replace 0's with 1. for nan-prevention.
-        user_offset_global_average = np.mean(simple_sum/simple_count)
+        #simple_count[simple_count == 0] = 1  # replace 0's with 1. for nan-prevention.
+        user_offset_global_average = np.sum(simple_sum)/np.sum(simple_count)
+        if user_offset_global_average == np.nan:
+            raise Exception('Error NaN in global average of offsets')
         self.user_offsets = compute_blended_indexed_averages(
             simple_sum=simple_sum,
             simple_count=simple_count,
@@ -84,32 +91,25 @@ class DataStats():
         pickle.dump(self, file=open(file_path, 'wb'))
 
 
-def compute_simple_indexed_sum_and_count(data_indices, data_values, averages=[], averages_indices=[]):
-    """compute_simple_indexed_sum_and_count
-    Params:
-    - data_indices   : np.array of indices corresponding to the data in data_values.
-    - data_values    : np.array of values to be summed and counted and indexed by indices in
-                                        data_indices
-    - data_averages  : np.array of averages (indexed according to averages_indices) to be
-                                        subtracted from the sum calculation.
-    - averages_indices : np.array of indices of the averages
-    Returns:
-    indexed_sum, indexed_count : tuple of np.array's
-    """
+def compute_simple_indexed_sum_and_count(data_indices, data_values):
     if data_indices.shape != data_values.shape:
         raise ValueError('Error! Shapes of index array and data array are not the same!')
     array_length = np.amax(data_indices) + 1
+    print('DataIndices was {} so i put {}'.format(data_indices, array_length))
+    data = zip(data_indices, data_values)
     indexed_sum = np.zeros(shape=(array_length,), dtype=np.float32)
     indexed_count = np.zeros(shape=(array_length,), dtype=np.int32)
-    for loop_index in range(0, len(data_values)):
-        data_index = data_indices[loop_index]
-        data_value = data_values[loop_index]
-        indexed_sum[data_index] += data_value
-        if averages != []:
-            averages_index = averages_indices[loop_index]
-            indexed_sum[data_index] -= averages[averages_index]
-        indexed_count[data_index] += 1
+    for index, value in data:
+        indexed_sum[index] += value
+        indexed_count[index] += 1
     return indexed_sum, indexed_count
+
+
+def compute_offsets(data_values, data_indices, averages):
+    offsets = np.zeros(shape=data_values.shape, dtype=np.float32)
+    for index, value in enumerate(data_values):
+        offsets[index] += value - averages[data_indices[index]]
+    return offsets
 
 
 def compute_blended_indexed_averages(simple_sum, simple_count, global_average):

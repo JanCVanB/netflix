@@ -21,8 +21,7 @@ def make_simple_stats():
     from utils.data_stats import DataStats
     stats = DataStats()
     stats.load_data_set(data_set=make_simple_test_set())
-    stats.compute_movie_stats()
-    stats.compute_user_stats()
+    stats.compute_stats()
     return stats
 
 
@@ -77,6 +76,59 @@ def test_compute_movie_stats_calls_appropriate_functions():
     importlib.reload(utils.data_stats)
 
 
+def test_compute_stats_calculates_expected_stats():
+    #  Using make_simple_test_set, calculate the expected movie_stats by hand
+    from utils.data_stats import DataStats
+    from utils.constants import BLENDING_RATIO as K
+    data_set = make_simple_test_set()
+#   Test Set:
+#    [0, 1, 0, 5],
+#    [0, 0, 0, 3],
+#    [1, 1, 0, 4],
+#    [2, 1, 0, 2],
+#    [2, 0, 0, 5]],
+    expected_num_users = 3
+    expected_num_movies = 2
+    expected_global_average = 3.8  # (5+3+4+2+5)/5
+    # averages (blended): [((3.8*K + 8)/(K+2), (3.8*K+11)/(K+3))]
+    expected_movie_averages = np.array([3.814814814815, 3.78571428571429], dtype=np.float32)
+    expected_movie_rating_count = np.array([2, 3], dtype=np.int32)
+    expected_movie_rating_sum = np.array([8, 11], dtype=np.int32)
+#   user 0 offsets: 5-3.523809523
+    user_0_offsets = np.array([5-expected_movie_averages[1],
+                               3-expected_movie_averages[0]], dtype=np.float32)
+    user_1_offsets = np.array([4-expected_movie_averages[1]], dtype=np.float32)
+    user_2_offsets = np.array([2-expected_movie_averages[1],
+                               5-expected_movie_averages[0]], dtype=np.float)
+    expected_user_rating_count = np.array([2, 1, 2], dtype=np.int32)
+    expected_user_offset_sum = np.array([np.sum(user_0_offsets),
+                                          np.sum(user_1_offsets),
+                                          np.sum(user_2_offsets)], dtype=np.float32)
+    global_user_offset = np.sum(expected_user_offset_sum)/np.sum(expected_user_rating_count)
+    expected_user_offsets = np.array(
+        [(global_user_offset*K+expected_user_offset_sum[i])/(K+expected_user_rating_count[i])
+         for i in range(0, 3)], dtype=np.float32)
+    stats = DataStats()
+    stats.load_data_set(data_set)
+    stats.compute_stats()
+    assert stats.num_users == expected_num_users
+    assert stats.num_movies == expected_num_movies
+    assert stats.global_average == expected_global_average
+    np.testing.assert_array_almost_equal(stats.movie_averages,
+                                         expected_movie_averages)
+    np.testing.assert_array_almost_equal(stats.movie_rating_count,
+                                         expected_movie_rating_count)
+    np.testing.assert_array_almost_equal(stats.movie_rating_sum,
+                                         expected_movie_rating_sum)
+    np.testing.assert_array_almost_equal(stats.user_offsets,
+                                         expected_user_offsets)
+    np.testing.assert_array_almost_equal(stats.user_rating_count,
+                                         expected_user_rating_count)
+    np.testing.assert_array_almost_equal(stats.user_offsets_sum,
+                                         expected_user_offset_sum)
+
+
+
 def test_compute_user_stats_calls_appropriate_functions():
     import utils.data_stats
     from utils.data_stats import DataStats
@@ -85,9 +137,11 @@ def test_compute_user_stats_calls_appropriate_functions():
     utils.data_stats.compute_simple_indexed_sum_and_count = MagicMock(return_value=(np.array([0]),
                                                                               np.array([0])))
     utils.data_stats.compute_blended_indexed_averages = MagicMock(return_value=np.array([0]))
+    utils.data_stats.compute_offsets = MockThatTracksCallsWithoutRunning()
     stats.compute_user_stats()
     assert utils.data_stats.compute_simple_indexed_sum_and_count.call_count == 1
     assert utils.data_stats.compute_blended_indexed_averages.call_count == 1
+    assert utils.data_stats.compute_offsets.call_count == 1
     import importlib
     importlib.reload(utils.data_stats)
 
@@ -111,11 +165,11 @@ def test_compute_simple_indexed_sum_and_count_returns_correct_values():
                                   expected_indexed_count)
 
 
-def test_compute_simple_indexed_sum_and_count_performs_offset_calculations_when_given_data_averages():
+def test_compute_offsets_returns_correct_array():
     import utils.data_stats
     import importlib as imp
     imp.reload(utils.data_stats)
-    from utils.data_stats import compute_simple_indexed_sum_and_count
+    from utils.data_stats import compute_offsets
     from utils.constants import USER_INDEX, MOVIE_INDEX, RATING_INDEX
     test_data = make_simple_test_set()
 #    [0, 1, 0, 5],
@@ -124,18 +178,14 @@ def test_compute_simple_indexed_sum_and_count_performs_offset_calculations_when_
 #    [2, 1, 0, 2],
 #    [2, 0, 0, 5]], dtype=np.int32)
     test_averages = np.array([4, 11/3], dtype=np.float32)
-    test_indexed_sum, test_indexed_count = compute_simple_indexed_sum_and_count(
-        data_indices=test_data[:, USER_INDEX],
+    test_offsets = compute_offsets(
         data_values=test_data[:, RATING_INDEX],
-        averages_indices=test_data[:, MOVIE_INDEX],
+        data_indices=test_data[:, MOVIE_INDEX],
         averages=test_averages
     )
-    expected_indexed_sum = np.array([(5-(11/3)+3-4), 4-(11/3), 2-(11/3)+5-4], dtype=np.float32)
-    expected_indexed_count = np.array([2, 1, 2], dtype=np.int32)
-    np.testing.assert_almost_equal(test_indexed_sum,
-                                   expected_indexed_sum, decimal=6)
-    np.testing.assert_almost_equal(test_indexed_count,
-                                   expected_indexed_count, decimal=6)
+    expected_offsets = np.array([5-(11/3), -1, 4-(11/3), 2-(11/3), 1], dtype=np.float32)
+    np.testing.assert_almost_equal(test_offsets,
+                                   expected_offsets, decimal=6)
 
 
 def test_compute_simple_indexed_sum_and_count_expects_arrays_of_same_size():

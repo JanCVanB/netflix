@@ -17,10 +17,7 @@ def compute_stats_for_data_set_name(name):
     print('Loading data set from {}...'.format(data_set_path))
     data_set = load_numpy_array_from_file(file_name=data_set_path)
     stats.load_data_set(data_set)
-    print('[1/2] Computing movie stats...')
-    stats.compute_movie_stats()
-    print('[2/2] Computing user stats...')
-    stats.compute_user_stats()
+    stats.compute_stats()
     print('Saving stats to file: {}'.format(stats_path))
     stats.write_stats_to_file(file_path=stats_path)
 
