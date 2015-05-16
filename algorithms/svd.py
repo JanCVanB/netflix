@@ -94,6 +94,10 @@ class SVD(Model):
                 self.update_feature_in_c(feature)
             else:
                 self.update_feature(feature)
+            if np.isnan(np.sum(self.movies)) or np.isnan(np.sum(self.users)):
+                print("So, I found a NaN after updating feature {}..".format(feature))
+                import pdb
+                pdb.set_trace()
 
     def update_feature(self, feature):
         if self.debug:

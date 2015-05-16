@@ -109,7 +109,7 @@ def compute_offsets(data_values, data_indices, averages):
 
 def compute_blended_indexed_averages(simple_sum, simple_count, global_average):
     return np.array([((global_average * BLENDING_RATIO + simple_sum[i])/(BLENDING_RATIO + simple_count[i]))
-                     for i in range(len(simple_sum))])
+                     for i in range(len(simple_sum))], dtype=np.float32)
 
 
 def compute_global_average_rating(data_set):
