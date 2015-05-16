@@ -43,15 +43,12 @@ class DataStats():
             data_values=self.data_set[:, RATING_INDEX],
             data_indices=self.data_set[:, MOVIE_INDEX]
             )
-        print('Simples: {} {}'.format(simple_sum, simple_count))
         global_average = compute_global_average_rating(data_set=self.data_set)
-        print('global: {}'.format(global_average))
         self.movie_averages = compute_blended_indexed_averages(
             simple_sum=simple_sum,
             simple_count=simple_count,
             global_average=global_average
             )
-        print('Avgs: {}'.format(self.movie_averages))
         self.movie_rating_count = simple_count
         self.movie_rating_sum = simple_sum
         self.global_average = global_average
@@ -65,7 +62,6 @@ class DataStats():
             data_indices=self.data_set[:, USER_INDEX],
             data_values=simple_offsets,
         )
-        #simple_count[simple_count == 0] = 1  # replace 0's with 1. for nan-prevention.
         user_offset_global_average = np.sum(simple_sum)/np.sum(simple_count)
         if user_offset_global_average == np.nan:
             raise Exception('Error NaN in global average of offsets')
@@ -95,7 +91,6 @@ def compute_simple_indexed_sum_and_count(data_indices, data_values):
     if data_indices.shape != data_values.shape:
         raise ValueError('Error! Shapes of index array and data array are not the same!')
     array_length = np.amax(data_indices) + 1
-    print('DataIndices was {} so i put {}'.format(data_indices, array_length))
     data = zip(data_indices, data_values)
     indexed_sum = np.zeros(shape=(array_length,), dtype=np.float32)
     indexed_count = np.zeros(shape=(array_length,), dtype=np.int32)
