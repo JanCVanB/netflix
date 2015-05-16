@@ -5,12 +5,12 @@ sys.path.append(abspath(dirname(dirname(__file__))))
 from algorithms.svd import SVD
 from scripts.run_model import run
 
-NUMBER_OF_EPOCHS = 10
-NUMBER_OF_FEATURES = 40
+NUMBER_OF_EPOCHS = 50
+NUMBER_OF_FEATURES = 25
 TRAIN_SET_NAME = 'base'
 TEST_SET_NAME = 'valid'
 
-model = SVD(num_features=NUMBER_OF_FEATURES)
+model = SVD(learn_rate=0.001, num_features=NUMBER_OF_FEATURES)
 model.run_c = True
 try:
     run(model, TRAIN_SET_NAME, TEST_SET_NAME,

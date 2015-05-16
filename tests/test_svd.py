@@ -41,8 +41,7 @@ def make_simple_stats():
     from utils.data_stats import DataStats
     stats = DataStats()
     stats.load_data_set(data_set=make_simple_train_points())
-    stats.compute_movie_stats()
-    stats.compute_user_stats()
+    stats.compute_stats()
     return stats
 
 
@@ -193,7 +192,7 @@ def test_svd_predict_returns_expected_ratings():
         user, movie, _, _ = get_user_movie_time_rating(test_point)
         expected_ratings[i] = model.calculate_prediction(user, movie)
     actual_ratings = model.predict(simple_test_points)
-    np.testing.assert_array_equal(actual_ratings, expected_ratings)
+    np.testing.assert_array_almost_equal(actual_ratings, expected_ratings)
 
 
 def test_svd_train_more_does_not_set_train_points_when_none_passed():

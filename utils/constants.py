@@ -29,3 +29,6 @@ RATING_INDEX = 3
 
 SVD_FEATURE_VALUE_INITIAL = 0.01
 """Default value for initial algorithm predictions"""
+
+BLENDING_RATIO = 25
+"""Blending ratio (K) described by funny to blend global mean and movie mean"""
