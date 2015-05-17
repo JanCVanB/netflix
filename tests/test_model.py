@@ -22,13 +22,13 @@ def test_model_load_creates_the_expected_instance():
         with open(load_file_path, 'wb+') as load_file:
             pickle.dump(model, load_file)
         loaded_model = Model.load(load_file_name)
+        assert loaded_model.x == model.x
+        np.testing.assert_array_equal(loaded_model.y, model.y)
     finally:
         try:
             os.remove(load_file_path)
         except FileNotFoundError:
             pass
-    assert loaded_model.x == model.x
-    np.testing.assert_array_equal(loaded_model.y, model.y)
 
 
 def test_model_save_writes_the_expected_file():
@@ -48,10 +48,10 @@ def test_model_save_writes_the_expected_file():
         model.save(save_file_name)
         with open(save_file_path, 'rb') as save_file:
             saved_model = pickle.load(save_file)
+        assert saved_model.x == model.x
+        np.testing.assert_array_equal(saved_model.y, model.y)
     finally:
         try:
             os.remove(save_file_path)
         except FileNotFoundError:
             pass
-    assert saved_model.x == model.x
-    np.testing.assert_array_equal(saved_model.y, model.y)
