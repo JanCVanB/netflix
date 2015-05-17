@@ -1,4 +1,3 @@
-from math import sqrt
 import numpy as np
 import sys
 from time import time
@@ -62,6 +61,22 @@ class SVD(Model):
 
     def set_stats(self, stats):
         self.stats = stats
+
+    def train_feature_epoch(self, train_points, stats, epochs):
+        self.set_train_points(train_points)
+        self.set_stats(stats)
+        self.initialize_users_and_movies()
+        print('Training using feature-epoch order.')
+        for feature in range(self.num_features):
+            print('\nFeature #{}'.format(feature+1))
+            for epoch in range(epochs):
+                self.update_feature_in_c(feature)
+                sys.stdout.write('=')
+                sys.stdout.flush()
+                if np.isnan(np.sum(self.movies)) or np.isnan(np.sum(self.users)):
+                    print("So, I found a NaN..")
+                    import pdb
+                    pdb.set_trace()
 
     def train(self, train_points, stats, epochs=1):
         self.set_train_points(train_points)

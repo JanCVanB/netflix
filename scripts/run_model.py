@@ -13,7 +13,7 @@ def calculate_rmse(true_ratings, predictions):
     return sqrt(((predictions - true_ratings) ** 2).mean())
 
 
-def run(model, train_set_name, test_set_name, epochs=None, features=None):
+def run(model, train_set_name, test_set_name, epochs=None, features=None, feature_epoch_order=False):
     print('Training {model_class} on "{train}" ratings'
           .format(model_class=model.__class__.__name__, train=train_set_name))
     if epochs is not None:
@@ -28,15 +28,19 @@ def run(model, train_set_name, test_set_name, epochs=None, features=None):
     train_points = load_numpy_array_from_file(train_file_path)
     stats = load_stats_from_file(stats_file_path)
     times = strftime(time_format, localtime())
-    model.train(train_points, stats=stats, epochs=epochs)
+    if not feature_epoch_order:
+        model.train(train_points, stats=stats, epochs=epochs)
+    else:
+        model.train_feature_epoch(train_points=train_points, stats=stats, epochs=epochs)
     times += '_to_' + strftime(time_format, localtime())
     model.train_points = None
 
     epochs_string = '' if epochs is None else ('_%sepochs' % epochs)
     features_string = '' if features is None else ('_%sfeatures' % features)
-    template_file_name = ('svd_{train}{e}{f}_xxx_{times}'
+    order_string = '' if feature_epoch_order is False else ('_feature_epoch_order')
+    template_file_name = ('svd_{train}{e}{f}_xxx{order}_{times}'
                           .format(train=train_set_name, e=epochs_string,
-                                  f=features_string, times=times))
+                                  f=features_string, order=order_string, times=times))
 
     model_file_name = template_file_name.replace('xxx', 'model') + '.p'
     model.save(model_file_name)
