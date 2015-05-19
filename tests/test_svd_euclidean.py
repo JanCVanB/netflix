@@ -1,5 +1,5 @@
 import numpy as np
-from unittest.mock import Mock, call
+from unittest.mock import Mock, call, patch
 from utils.data_io import get_user_movie_time_rating
 
 MockThatAvoidsErrors = Mock
@@ -138,4 +138,30 @@ def test_update_euclidean_all_features_calls_update_user_and_movie_for_each_feat
                  )
         )
     model.update_user_and_movie.assert_has_calls(expected_calls,
-                                                         any_order=True)
+                                                 any_order=True)
+
+
+def test_train_epoch_in_c_returns_same_as_train_epoch():
+    from algorithms.svd_euclidean import SVDEuclidean
+    py_model = SVDEuclidean(learn_rate=10, k_factor=0.5)
+    c_model = SVDEuclidean(learn_rate=10, k_factor=0.5)
+    initialize_model_with_simple_train_points_but_do_not_train(py_model)
+    initialize_model_with_simple_train_points_but_do_not_train(c_model)
+    c_model.users = np.copy(py_model.users)  # Because randomly initialized
+    c_model.movies = np.copy(py_model.movies)
+    py_model.train_epoch()
+    c_model.train_epoch_in_c()
+    np.testing.assert_array_almost_equal(c_model.users, py_model.users)
+    np.testing.assert_array_almost_equal(c_model.movies, py_model.movies)
+
+
+@patch('utils.c_interface.c_svd_euclidean_train_epoch')
+def test_train_epoch_in_c_calls_c_svd_euclidean_train_epoch(mock_c_train):
+    from algorithms.svd_euclidean import SVDEuclidean
+    model = SVDEuclidean()
+    initialize_model_with_simple_train_points_but_do_not_train(model)
+    model.train_epoch_in_c()
+    assert mock_c_train.call_count == 1
+
+
+
