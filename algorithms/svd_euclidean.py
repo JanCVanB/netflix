@@ -1,6 +1,7 @@
 import numpy as np
 from algorithms.svd import SVD
 from utils.data_io import get_user_movie_time_rating
+import sys
 
 
 class SVDEuclidean(SVD):
@@ -32,7 +33,12 @@ class SVDEuclidean(SVD):
             self.train_epoch()
 
     def train_epoch(self):
+        count = 0
         for train_point in self.train_points:
+            count += 1
+            if count % 100000 == 0:
+                sys.stdout.write('.')
+                sys.stdout.flush()
             user, movie, _, rating = get_user_movie_time_rating(train_point)
             self.update_euclidean_all_features(user=user, movie=movie,
                                                rating=rating)

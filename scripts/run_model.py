@@ -13,9 +13,18 @@ def calculate_rmse(true_ratings, predictions):
     return sqrt(((predictions - true_ratings) ** 2).mean())
 
 
-def run(model, train_set_name, test_set_name, epochs=None, features=None, feature_epoch_order=False):
+def run(model, train_set_name, test_set_name, epochs=None, features=None,
+        feature_epoch_order=False, create_files=True):
     print('Training {model_class} on "{train}" ratings'
           .format(model_class=model.__class__.__name__, train=train_set_name))
+    if not create_files:
+        print("WARNING: 'nofile' flag detected. No model file will be " +
+              "saved to disk after this run.\n***MODEL WILL BE LOST.")
+        confirm = input("Are you sure you want to continue? [Y/n]")
+        if confirm == 'Y' or confirm == 'y' or confirm == '':
+            pass
+        else:
+            return
     if epochs is not None:
         print('Number of epochs:', epochs)
     if features is not None:
@@ -43,7 +52,8 @@ def run(model, train_set_name, test_set_name, epochs=None, features=None, featur
                                   f=features_string, order=order_string, times=times))
 
     model_file_name = template_file_name.replace('xxx', 'model') + '.p'
-    model.save(model_file_name)
+    if create_files:
+        model.save(model_file_name)
 
     print('Predicting "{test}" ratings'.format(test=test_set_name))
     test_file_path = join(DATA_DIR_PATH, test_set_name + '.npy')
@@ -58,7 +68,8 @@ def run(model, train_set_name, test_set_name, epochs=None, features=None, featur
     print('RMSE:', rmse)
     rmse_file_name = (template_file_name.replace('xxx', 'rmse_' + test_set_name)
                       + '.txt')
-    save_rmse(rmse, rmse_file_name)
+    if create_files:
+        save_rmse(rmse, rmse_file_name)
 
 
 def run_multi(model, train_set_name, test_set_name, epochs=None, features=None):
