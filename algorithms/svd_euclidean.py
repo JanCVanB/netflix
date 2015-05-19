@@ -39,6 +39,15 @@ class SVDEuclidean(SVD):
                 pass
                 # print('RMSE: ')
 
+    def train_more(self, train_set=None, epochs=1):
+        if train_set is not None:
+            self.train_points = train_set
+        for epoch in range(epochs):
+            if self.run_c:
+                self.train_epoch_in_c()
+            else:
+                self.train_epoch()
+
     def train_epoch(self):
         count = 0
         for train_point in self.train_points:
@@ -68,4 +77,3 @@ class SVDEuclidean(SVD):
         for feature in range(self.num_features):
             self.update_user_and_movie(user=user, movie=movie, feature=feature,
                                        error=prediction_error)
-
