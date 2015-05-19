@@ -31,7 +31,13 @@ class SVDEuclidean(SVD):
                 print("So, I found a NaN..")
                 import pdb
                 pdb.set_trace()
-            self.train_epoch()
+            if self.run_c:
+                self.train_epoch_in_c()
+            else:
+                self.train_epoch()
+            if self.debug:
+                pass
+                # print('RMSE: ')
 
     def train_epoch(self):
         count = 0
