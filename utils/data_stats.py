@@ -79,6 +79,8 @@ class DataStats():
                     user_x = self.mu_data_set[rating_x_index, MU_USER_INDEX]
                     while (user_y > user_x):
                         rating_x_index += 1
+                        if rating_x_index >= len(self.mu_data_set[:, MU_MOVIE_INDEX]):
+                            break
                         if (self.mu_data_set[rating_x_index, MU_MOVIE_INDEX] == movie_x):
                             user_x = self.mu_data_set[rating_x_index, MU_USER_INDEX]
                         else:

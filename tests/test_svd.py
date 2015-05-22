@@ -36,11 +36,21 @@ def make_simple_train_points():
                      (5, 2, 0, 2))
     return np.array(train_ratings, dtype=np.int32)
 
+def make_simple_train_points_movie_user():
+    train_ratings = ((1, 5, 0, 3),
+                     (2, 1, 0, 1),
+                     (2, 5, 0, 2),
+                     (3, 1, 0, 1),
+                     (3, 2, 0, 4),
+                     (4, 3, 0, 2),
+                     (5, 4, 0, 5))
+    return np.array(train_ratings, dtype=np.int32)
+
 
 def make_simple_stats():
     from utils.data_stats import DataStats
     stats = DataStats()
-    stats.load_data_set(data_set=make_simple_train_points())
+    stats.load_data_set(data_set=make_simple_train_points(), mu_data_set=make_simple_train_points_movie_user())
     stats.compute_stats()
     return stats
 
