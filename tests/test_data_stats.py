@@ -4,6 +4,9 @@ from unittest.mock import Mock, MagicMock
 MockThatTracksCallsWithoutRunning = Mock
 MockThatReturnsZeroNumpyTuple = Mock(return_value=(np.array([0]),
                                                    np.array([0])))
+MockThatReturnsZeroNumpyTriple = Mock(return_value=(np.array([0]),
+                                                    np.array([0]),
+                                                   np.array([0])))
 MockThatReturnsZeroNumpy = Mock(return_value=np.array([0]))
 
 
@@ -16,11 +19,22 @@ def make_simple_test_set():
         [2, 0, 0, 5]], dtype=np.int32)
     return test_data_set
 
+def make_simple_test_set_movie_user():
+    test_data_set = np.array([
+        [0, 0, 0, 3],
+        [0, 2, 0, 5],
+        [1, 0, 0, 5],
+        [1, 1, 0, 4],
+        [1, 2, 0, 2]], dtype=np.int32)
+    return test_data_set
+
 
 def make_simple_stats():
     from utils.data_stats import DataStats
     stats = DataStats()
-    stats.load_data_set(data_set=make_simple_test_set())
+    test_set = make_simple_test_set()
+    mu_test_set = make_simple_test_set_movie_user()
+    stats.load_data_set(data_set=test_set, mu_data_set=mu_test_set)
     stats.compute_stats()
     return stats
 
@@ -29,7 +43,8 @@ def test_init_movie_and_user_arrays_creates_numpy_arrays():
     from utils.data_stats import DataStats
     stats = DataStats()
     test_set = make_simple_test_set()
-    stats.load_data_set(data_set=test_set)
+    mu_test_set = make_simple_test_set_movie_user()
+    stats.load_data_set(data_set=test_set, mu_data_set=mu_test_set)
     stats.init_movie_and_user_arrays()
     assert isinstance(stats.movie_averages, np.ndarray)
     assert isinstance(stats.movie_rating_count, np.ndarray)
@@ -43,14 +58,17 @@ def test_compute_stats_calls_appropriate_functions():
     from utils.data_stats import DataStats
     stats = DataStats()
     test_set = make_simple_test_set()
-    stats.load_data_set(data_set=test_set)
+    mu_test_set = make_simple_test_set_movie_user()
+    stats.load_data_set(data_set=test_set, mu_data_set=mu_test_set)
     stats.init_movie_and_user_arrays = MockThatTracksCallsWithoutRunning()
     stats.compute_movie_stats = MockThatTracksCallsWithoutRunning()
     stats.compute_user_stats = MockThatTracksCallsWithoutRunning()
+    stats.compute_similarity_coefficient = MockThatTracksCallsWithoutRunning()
     stats.compute_stats()
     assert stats.init_movie_and_user_arrays.call_count == 1
     assert stats.compute_movie_stats.call_count == 1
     assert stats.compute_user_stats.call_count == 1
+    assert stats.compute_similarity_coefficient.call_count == 1
 
 
 def test_compute_global_average_rating_returns_correct_value():
@@ -66,8 +84,8 @@ def test_compute_movie_stats_calls_appropriate_functions():
     import utils.data_stats
     from utils.data_stats import DataStats
     stats = DataStats()
-    stats.load_data_set(make_simple_test_set())
-    utils.data_stats.compute_simple_indexed_sum_and_count = MockThatReturnsZeroNumpyTuple
+    stats.load_data_set(make_simple_test_set(),make_simple_test_set_movie_user())
+    utils.data_stats.compute_simple_indexed_sum_and_count = MockThatReturnsZeroNumpyTriple
     utils.data_stats.compute_blended_indexed_averages = MockThatReturnsZeroNumpy
     stats.compute_movie_stats()
     assert utils.data_stats.compute_simple_indexed_sum_and_count.call_count == 1
@@ -81,6 +99,7 @@ def test_compute_stats_calculates_expected_stats():
     from utils.data_stats import DataStats
     from utils.constants import BLENDING_RATIO as K
     data_set = make_simple_test_set()
+    mu_test_set = make_simple_test_set_movie_user()
 #   Test Set:
 #    [0, 1, 0, 5],
 #    [0, 0, 0, 3],
@@ -109,7 +128,7 @@ def test_compute_stats_calculates_expected_stats():
         [(global_user_offset*K+expected_user_offset_sum[i])/(K+expected_user_rating_count[i])
          for i in range(0, 3)], dtype=np.float32)
     stats = DataStats()
-    stats.load_data_set(data_set)
+    stats.load_data_set(data_set=data_set, mu_data_set=mu_test_set)
     stats.compute_stats()
     assert stats.num_users == expected_num_users
     assert stats.num_movies == expected_num_movies
@@ -133,9 +152,12 @@ def test_compute_user_stats_calls_appropriate_functions():
     import utils.data_stats
     from utils.data_stats import DataStats
     stats = DataStats()
-    stats.load_data_set(make_simple_test_set())
+    test_set = make_simple_test_set()
+    mu_test_set = make_simple_test_set_movie_user()
+    stats.load_data_set(data_set=test_set, mu_data_set=mu_test_set)
     utils.data_stats.compute_simple_indexed_sum_and_count = MagicMock(return_value=(np.array([0]),
-                                                                              np.array([0])))
+                                                                            np.array([0]),
+                                                                            np.array([0])))
     utils.data_stats.compute_blended_indexed_averages = MagicMock(return_value=np.array([0]))
     utils.data_stats.compute_offsets = MockThatTracksCallsWithoutRunning()
     stats.compute_user_stats()
@@ -153,12 +175,15 @@ def test_compute_simple_indexed_sum_and_count_returns_correct_values():
     from utils.data_stats import compute_simple_indexed_sum_and_count
     test_data = np.array([16.5, 33, 4, -5, 12, -7.5], dtype=np.float32)
     index_array = np.array([0, 1, 2,  3,  4,  0], dtype=np.int32)
-    test_indexed_sum, test_indexed_count = compute_simple_indexed_sum_and_count(
+    test_indexed_squared_sum, test_indexed_sum, test_indexed_count = compute_simple_indexed_sum_and_count(
         data_indices=index_array,
         data_values=test_data
     )
+    expected_indexed_squared_sum = np.array([328.5, 1089, 16, 25, 144], dtype=np.float32)
     expected_indexed_sum = np.array([9, 33, 4, -5, 12], dtype=np.float32)
     expected_indexed_count = np.array([2, 1, 1, 1, 1], dtype=np.int32)
+    np.testing.assert_almost_equal(test_indexed_squared_sum,
+                                   expected_indexed_squared_sum)
     np.testing.assert_almost_equal(test_indexed_sum,
                                    expected_indexed_sum)
     np.testing.assert_array_equal(test_indexed_count,
@@ -193,7 +218,7 @@ def test_compute_simple_indexed_sum_and_count_expects_arrays_of_same_size():
     test_arr1 = np.ones(shape=(10,))
     test_arr2 = np.ones(shape=(11,))
     try:
-        _, _ = compute_simple_indexed_sum_and_count(
+        _, _, _ = compute_simple_indexed_sum_and_count(
             test_arr1,
             test_arr2
         )
@@ -202,6 +227,36 @@ def test_compute_simple_indexed_sum_and_count_expects_arrays_of_same_size():
     else:
         raise Exception('Function should have raised an exception on ' +
                         'mismatched array size.')
+
+def test_compute_std_deviation_returns_correct_values():
+    from utils.data_stats import DataStats
+#    [0, 1, 0, 5],
+#    [0, 0, 0, 3],
+#    [1, 1, 0, 4],
+#    [2, 1, 0, 2],
+#    [2, 0, 0, 5]], dtype=np.int32)
+    stats = DataStats()
+    test_set = make_simple_test_set()
+    mu_test_set = make_simple_test_set_movie_user()
+    stats.load_data_set(data_set=test_set, mu_data_set=mu_test_set)
+    stats.compute_stats()
+    test_std_deviation = stats.compute_standard_deviation()
+    expected_std_deviation = np.array([1, 1.2472191], dtype=np.float32)
+    np.testing.assert_almost_equal(test_std_deviation,
+                                   expected_std_deviation)
+
+
+def test_compute_similarity_coefficient_returns_correct_values():
+    from utils.data_stats import DataStats
+    stats = DataStats()
+    test_set = make_simple_test_set()
+    mu_test_set = make_simple_test_set_movie_user()
+    stats.load_data_set(data_set=test_set, mu_data_set=mu_test_set)
+    stats.compute_stats()
+    test_similarity_matrix = stats.similarity_coefficient
+    expected_similarity_matrix = (np.array([0.0196078, 0], dtype=np.float32), np.array([-0.0235819  , 0.0291262], dtype=np.float32))
+    np.testing.assert_almost_equal(test_similarity_matrix,
+                                   expected_similarity_matrix)
 
 
 def test_compute_blended_indexed_averages_returns_correct_values():
@@ -256,7 +311,9 @@ def test_load_data_set_loads_data_successfully():
     from utils.data_stats import DataStats
     stats = DataStats()
     test_data_set = make_simple_test_set()
-    stats.load_data_set(data_set=test_data_set)
+    test_set = make_simple_test_set()
+    mu_test_set = make_simple_test_set_movie_user()
+    stats.load_data_set(data_set=test_set, mu_data_set=mu_test_set)
     np.testing.assert_array_equal(stats.data_set, test_data_set)
 
 

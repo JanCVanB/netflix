@@ -20,6 +20,12 @@ USER_INDEX = 0
 MOVIE_INDEX = 1
 """Index of movie ID in data point tuple for all data point arrays"""
 
+MU_USER_INDEX = 1
+"""Index of user ID in data point tuple for reversed data arrays"""
+
+MU_MOVIE_INDEX = 0
+"""Index of movie ID in data point tuple for reversed data arrays"""
+
 TIME_INDEX = 2
 """Index of time stamp in data point tuple for all data point arrays"""
 
