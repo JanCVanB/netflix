@@ -3,6 +3,7 @@
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 """
 import json
+import math
 from matplotlib import cm
 from matplotlib.ticker import MaxNLocator
 import matplotlib.pyplot as plt
@@ -24,19 +25,21 @@ def main():
 
 def get_info(rmse_file_paths):
     combined_info_dict = {}
-    info_dicts = []
+    infos = []
     for rmse_file_path in rmse_file_paths:
         result = Result(rmse_file_path)
-        info_dicts.append(result.info)
-    for info_dict in info_dicts:
-        for key, value in info_dict.items():
+        infos.append(result.info)
+    for info in infos:
+        for key, value in info.__dict__.items():
             if key not in combined_info_dict:
                 combined_info_dict[key] = [value]
-            else:
+            elif value not in combined_info_dict[key]:
                 combined_info_dict[key].append(value)
     for key, value in combined_info_dict.items():
         if len(value) == 1:
             combined_info_dict[key] = value[0]
+        else:
+            combined_info_dict[key] = ' and '.join(str(v) for v in value)
     return ResultInfo(combined_info_dict)
 
 
@@ -48,7 +51,7 @@ def get_points(rmse_file_paths):
             for epoch, line in enumerate(rmse_file):
                 points.append(Point(epoch=epoch + 1,
                                     feature=result.info.num_features,
-                                    learn=result.info.learning_rate,
+                                    learning_rate=result.info.learning_rate,
                                     rmse=float(line.strip())))
     return points
 
@@ -68,76 +71,89 @@ class Result:
 class ResultInfo:
     def __init__(self, info_dict):
         self.algorithm = info_dict['algorithm']
-        self.last_commit = info_dict['commit']
+        self.last_commit = info_dict['last_commit']
         self.name = info_dict['name']
         self.time = info_dict['time']
-        self.num_epochs = info_dict['epochs']
-        self.num_features = info_dict['features']
-        self.learning_rate = info_dict['learn']
-        self.train_set_name = info_dict['train']
-        self.test_set_name = info_dict['test']
+        self.num_epochs = info_dict['num_epochs']
+        self.num_features = info_dict['num_features']
+        self.learning_rate = info_dict['learning_rate']
+        self.train_set_name = info_dict['train_set_name']
+        self.test_set_name = info_dict['test_set_name']
 
 
 class Point:
-    def __init__(self, epoch, feature, learn, rmse):
+    def __init__(self, epoch, feature, learning_rate, rmse):
         self.epoch = epoch
         self.feature = feature
-        self.learn = learn
+        self.learning_rate = learning_rate
         self.rmse = rmse
+
+    def __repr__(self):
+        return ('Epoch {e}, Feature {f}, Learn {lr}, RMSE {r}'
+                .format(e=self.epoch, f=self.feature, lr=self.learning_rate,
+                        r=self.rmse))
 
 
 def graph_all_surfaces(info, points):
-    figure_ef, axes_ef = get_epoch_feature_figure_and_axes(info)
-    figure_el, axes_el = get_epoch_learn_figure_and_axes(info)
-    figure_fl, axes_fl = get_feature_learn_figure_and_axes(info)
+    figure_e_vs_f, axes_e_vs_f = get_figure_and_axes_for_epoch_vs_feature(info)
+    figure_e_vs_l, axes_e_vs_l = get_figure_and_axes_for_epoch_vs_learn(info)
+    figure_f_vs_l, axes_f_vs_l = get_figure_and_axes_for_feature_vs_learn(info)
     epochs = [point.epoch for point in points]
     features = [point.feature for point in points]
     learns = [point.learning_rate for point in points]
     rmses = [point.rmse for point in points]
-    graph_surface(figure_ef, axes_ef, epochs, features, rmses)
-    graph_surface(figure_el, axes_el, epochs, learns, rmses)
-    graph_surface(figure_fl, axes_fl, features, learns, rmses)
-    plt.savefig(os.path.join(RESULTS_DIR_PATH, 'rmse_graph.png'))
+    graph_surface(figure_e_vs_f, axes_e_vs_f, epochs, features, rmses)
+    graph_surface(figure_e_vs_l, axes_e_vs_l, epochs, learns, rmses)
+    graph_surface(figure_f_vs_l, axes_f_vs_l, features, learns, rmses)
+    figure_e_vs_f.savefig(os.path.join(RESULTS_DIR_PATH,
+                                       'last_epoch_vs_feature_graph.png'))
+    figure_e_vs_l.savefig(os.path.join(RESULTS_DIR_PATH,
+                                       'last_epoch_vs_learn_graph.png'))
+    figure_f_vs_l.savefig(os.path.join(RESULTS_DIR_PATH,
+                                       'last_feature_vs_learn_graph.png'))
 
 
-def get_epoch_feature_figure_and_axes(info):
+def get_figure_and_axes_for_epoch_vs_feature(info):
+    title = ('Epochs vs. Features ({train} to {test})'
+             .format(train=info.train_set_name, test=info.test_set_name))
     figure = plt.figure()
+    figure.canvas.set_window_title(title)
     axes = figure.add_subplot(111, projection='3d')
     axes.get_xaxis().set_major_locator(MaxNLocator(integer=True))
     axes.get_yaxis().set_major_locator(MaxNLocator(integer=True))
-    axes.set_title('Epochs vs. Features ({train} to {test})'
-                   .format(train=info.train_set_name,
-                           test=info.test_set_name))
+    axes.set_title(title)
     axes.set_xlabel('Number of Epochs')
     axes.set_ylabel('Number of Features')
     axes.set_zlabel('RMSE ')
     return figure, axes
 
 
-def get_epoch_learn_figure_and_axes(info):
+def get_figure_and_axes_for_epoch_vs_learn(info):
+    title = ('Epochs vs. Learning Rates ({train} to {test})'
+             .format(train=info.train_set_name, test=info.test_set_name))
     figure = plt.figure()
+    figure.canvas.set_window_title(title)
     axes = figure.add_subplot(111, projection='3d')
     axes.get_xaxis().set_major_locator(MaxNLocator(integer=True))
     # TODO: learning rate locator
     # axes.get_yaxis().set_major_locator(MaxNLocator(integer=True))
-    axes.set_title('Epochs vs. Learning Rates ({train} to {test})'
-                   .format(train=info.train_set_name,
-                           test=info.test_set_name))
+    axes.set_title(title)
     axes.set_xlabel('Number of Epochs')
     axes.set_ylabel('Learning Rate')
     axes.set_zlabel('RMSE ')
     return figure, axes
 
 
-def get_feature_learn_figure_and_axes(info):
+def get_figure_and_axes_for_feature_vs_learn(info):
+    title = ('Features vs. Learning Rates ({train} to {test})'
+             .format(train=info.train_set_name, test=info.test_set_name))
     figure = plt.figure()
+    figure.canvas.set_window_title(title)
     axes = figure.add_subplot(111, projection='3d')
     axes.get_xaxis().set_major_locator(MaxNLocator(integer=True))
     # TODO: learning rate locator
     # axes.get_yaxis().set_major_locator(MaxNLocator(integer=True))
-    axes.set_title('Features vs. Learning Rates ({train} to {test})'
-                   .format(train=info.train_set_name,
-                           test=info.test_set_name))
+    axes.set_title(title)
     axes.set_xlabel('Number of Features')
     axes.set_ylabel('Learning Rate')
     axes.set_zlabel('RMSE ')
@@ -145,11 +161,27 @@ def get_feature_learn_figure_and_axes(info):
 
 
 def graph_surface(figure, axes, xs, ys, rmse_values):
+    xs, ys, rmse_values = sorted_minima(xs, ys, rmse_values)
     min_rmse_value = min(rmse_values)
     min_rmse_index = rmse_values.index(min_rmse_value)
     min_rmse_x_value = xs[min_rmse_index]
     min_rmse_y_value = ys[min_rmse_index]
     min_rmse_color = '#00DD00'
+    only_one_x_value = len(set(xs)) == 1
+    only_one_y_value = len(set(ys)) == 1
+    if only_one_x_value:
+        axes.plot(xs, ys, rmse_values)
+        axes.set_xlim(get_one_below_and_one_above(xs[0]))
+    elif only_one_y_value:
+        axes.plot(xs, ys, rmse_values)
+        axes.set_ylim(get_one_below_and_one_above(ys[0]))
+    else:
+        axes.set_xlim(min(xs), max(xs))
+        axes.set_ylim(min(ys), max(ys))
+        try:
+            axes.plot_trisurf(xs, ys, rmse_values, cmap=cm.CMRmap, linewidth=0)
+        except ValueError:
+            axes.plot(xs, ys, rmse_values)
     xlim = axes.get_xlim()
     ylim = axes.get_ylim()
     zlim = axes.get_zlim()
@@ -165,14 +197,30 @@ def graph_surface(figure, axes, xs, ys, rmse_values):
               [min_rmse_y_value, min_rmse_y_value],
               zs=[zlim[0], min_rmse_value],
               color=min_rmse_color, ls=':')
-    # TODO: always do surface?
-    if len(set(xs)) == 1 or len(set(ys)) == 1:
-        axes.plot(xs, ys, rmse_values)
-    else:
-        axes.plot_trisurf(xs, ys, rmse_values, cmap=cm.CMRmap, linewidth=0)
     annotate_point(figure, axes,
                    min_rmse_x_value, min_rmse_y_value, min_rmse_value,
                    min_rmse_color)
+
+def sorted_minima(xs, ys, zs):
+    points = zip(xs, ys, zs)
+    unique_points = set(points)
+    minimum_points = []
+    for new_point in unique_points:
+        for old_index, old_point in enumerate(minimum_points):
+            if old_point[:2] == new_point[:2]:
+                if new_point[2] < old_point[2]:
+                    minimum_points[old_index] = new_point
+                break
+        else:
+            minimum_points.append(new_point)
+    sorted_minimum_points = sorted(minimum_points)
+    print(sorted_minimum_points)
+    xs, ys, zs = zip(*sorted_minimum_points)
+    return xs, ys, zs
+
+def get_one_below_and_one_above(x):
+    delta = math.pow(10, math.floor(math.log10(x)))
+    return x - delta, x + delta
 
 
 def annotate_point(figure, axes, x, y, z, color):
