@@ -1,32 +1,37 @@
 # Inspired by Edwin Chen: github.com/echen/restricted-boltzmann-machines
 # and Salakhutdinov/Mnih/Hinton 2007: www.cs.toronto.edu/~amnih/papers/rbmcf.pdf
+# and Louppe/Guerts 2010: http://orbi.ulg.ac.be/handle/2268/74400
 import numpy
 
 import algorithms.model
 
 
 class RBM(algorithms.model.Model):
-    def __init__(self, learn_rate=0.001, num_hidden=100, num_visible=100):
+    def __init__(self, learn_rate=0.001, num_hidden=100):
         self.learn_rate = learn_rate
         self.num_hidden = num_hidden
-        self.num_visible = num_visible
-        # TODO: soft_max, weight_cost, momentum, final_momentum
+        self.num_visible = 0  # later set to the number of movies
+        # TODO: momentum, multiple learning rates
+        # TODO (maybe): soft_max, weight_cost, final_momentum?
         self.train_points = numpy.array([])
         self.weights = numpy.array([])
+        self.hidden_biases = numpy.array([])
+        self.visible_biases = numpy.array([])
 
     def train(self, train_points, number_of_epochs=1):
-        self.initialize_weights()
         self.set_train_points(train_points)
+        self.initialize_weights()
         self.run_multiple_epochs(number_of_epochs)
-
-    def initialize_weights(self):
-        self.weights = 0.1 * numpy.random.randn(self.num_visible + 1,
-                                                self.num_hidden + 1)
-        self.weights[0, :] = 0
-        self.weights[:, 0] = 0
 
     def set_train_points(self, train_points):
         self.train_points = train_points
+        self.num_visible = max(train_points[:, 1])
+
+    def initialize_weights(self):
+        self.weights = 0.1 * numpy.random.randn(self.num_visible,
+                                                self.num_hidden)
+        self.hidden_biases = numpy.zeros(self.num_hidden)
+        self.visible_biases = numpy.zeros(self.num_visible)
 
     def run_multiple_epochs(self, number_of_epochs):
         for epoch in range(number_of_epochs):
