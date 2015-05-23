@@ -35,13 +35,10 @@ class SVDEuclidean(SVD):
                 self.train_epoch_in_c()
             else:
                 self.train_epoch()
-            if self.debug:
-                pass
-                # print('RMSE: ')
 
     def train_more(self, train_set=None, epochs=1):
         if train_set is not None:
-            self.train_points = train_set
+            self.set_train_points(train_points)
         for epoch in range(epochs):
             if self.run_c:
                 self.train_epoch_in_c()

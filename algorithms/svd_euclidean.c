@@ -22,8 +22,9 @@ int c_train_epoch(int *train_points, int num_points, float *users, float *user_o
 		time       = *(train_cursor++);
 		rating     = *(train_cursor++);
         // Calculate the prediction error:
-        // baseline:
+        // start prediction at baseline:
         prediction = movie_averages[movie_id] + user_offsets[user_id];
+        // then: add features dot product to prediction
         user_features_cursor = users + user_id * num_features;
         movie_features_cursor = movies + movie_id * num_features;
         for (f = 0; f < num_features; f++) {
@@ -41,8 +42,10 @@ int c_train_epoch(int *train_points, int num_points, float *users, float *user_o
         // Update the features
         // reset feature cursors
         for (f = 0; f < num_features; f++) {
-            user_change = learn_rate * (error * movie_features_cursor[f] - k_factor * user_features_cursor[f]);
-            movie_features_cursor[f] += learn_rate * (error * user_features_cursor[f] - k_factor * movie_features_cursor[f]);
+            user_change = learn_rate * (error * movie_features_cursor[f] 
+                - k_factor * user_features_cursor[f]);
+            movie_features_cursor[f] += learn_rate * (error * user_features_cursor[f] 
+                - k_factor * movie_features_cursor[f]);
             user_features_cursor[f] += user_change;
         }
 
