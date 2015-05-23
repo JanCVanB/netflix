@@ -26,7 +26,7 @@ diff = [epoch for epoch in expected_epochs if epoch not in actual_epochs]
 if len(diff) > 1:
     raise Exception('Missing epochs: {}'
                     .format(', '.join([str(x) for x in diff])))
-if len(actual_epochs) > len(expected_epochs):
+if len(input_file_paths) > len(expected_epochs):
     raise Exception('Too many epochs - any extra files?\n{}'
                     .format('\n'.join(input_file_paths)))
 
