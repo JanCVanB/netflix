@@ -34,15 +34,19 @@ else:
 model.run_c = run_c
 
 try:
+    run_name = ''
+    while run_name == '':
+        run_name = input('Please enter a run name:')
     run(model=model,
         train_set_name=TRAIN_SET_NAME,
         test_set_name=TEST_SET_NAME,
         epochs=NUMBER_OF_EPOCHS,
-        features=NUMBER_OF_FEATURES,
         feature_epoch_order=feature_epoch,
+        run_name=run_name,
         create_files=create_files,
         run_multi=run_multi)
 except Exception as the_exception:
+    raise the_exception
     import pdb
     local_exception = the_exception
     pdb.set_trace()
