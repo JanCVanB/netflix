@@ -47,3 +47,34 @@ def c_svd_update_feature(train_points, users, user_offsets, movies, residuals,
     )
     if returned_value != 0:
         raise CException(returned_value)
+
+
+def c_svd_euclidean_train_epoch(train_points, users, user_offsets, movies,
+                                movie_averages, num_features, learn_rate,
+                                k_factor):
+    import ctypes
+    from ctypes import c_void_p, c_int32, c_float
+    import os
+    from utils.data_paths import LIBRARY_DIR_PATH
+    num_train_points = train_points.shape[0]
+    num_users = users.shape[0]
+    num_movies = movies.shape[0]
+    library_file_name = 'svd_euclidean.so'
+    library_file_path = os.path.join(LIBRARY_DIR_PATH, library_file_name)
+    svd_euclidean_lib = ctypes.cdll.LoadLibrary(library_file_path)
+    c_train_epoch = svd_euclidean_lib.c_train_epoch
+    returned_value = c_train_epoch(
+        c_void_p(train_points.ctypes.data),    # (void*) train_points
+        c_int32(num_train_points),             # (int)   num_train_points
+        c_void_p(users.ctypes.data),           # (void*) users
+        c_void_p(user_offsets.ctypes.data),    # (void*) user_offsets
+        c_int32(num_users),                    # (int)   num_users
+        c_void_p(movies.ctypes.data),          # (void*) movies
+        c_void_p(movie_averages.ctypes.data),  # (void*) movie_averages
+        c_int32(num_movies),                   # (int)   num_movies
+        c_float(learn_rate),                   # (float) learn_rate
+        c_int32(num_features),                 # (int)   num_features
+        c_float(k_factor)                      # (float) k_factor
+    )
+    if returned_value != 0:
+        raise CException(returned_value)

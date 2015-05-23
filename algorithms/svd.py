@@ -152,7 +152,9 @@ class SVD(Model):
                              num_features=self.num_features, learn_rate=self.learn_rate, k_factor=self.k_factor)
 
     def update_user_and_movie(self, user, movie, feature, error):
-        user_change = self.learn_rate * error * self.movies[movie, feature]
-        movie_change = self.learn_rate * error * self.users[user, feature]
+        user_change = self.learn_rate * (error * self.movies[movie, feature]
+                                         - self.k_factor * self.users[user, feature])
+        movie_change = self.learn_rate * (error * self.users[user, feature]
+                                          - self.k_factor * self.movies[movie, feature])
         self.users[user, feature] += user_change
         self.movies[movie, feature] += movie_change

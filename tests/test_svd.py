@@ -333,7 +333,7 @@ def test_svd_update_feature_in_c_modifies_users_and_movies_as_expected():
 
 def test_svd_update_user_and_movie_modifies_matrices_as_expected():
     from utils.data_io import get_user_movie_time_rating
-    model = svd.SVD()
+    model = svd.SVD(learn_rate=10, k_factor=0.5)
     initialize_model_with_simple_train_points_but_do_not_train(model)
     for train_point in model.train_points:
         user, movie, _, rating = get_user_movie_time_rating(train_point)
@@ -341,14 +341,18 @@ def test_svd_update_user_and_movie_modifies_matrices_as_expected():
             error = model.calculate_prediction_error(user, movie, rating)
             expected_users = np.copy(model.users)
             expected_movies = np.copy(model.movies)
-            expected_user_change = (model.learn_rate * error *
-                                    model.movies[movie, feature])
-            expected_movie_change = (model.learn_rate * error *
-                                     model.users[user, feature])
+            expected_user_change = (
+                model.learn_rate * (error * model.movies[movie, feature]
+                                    - model.k_factor * model.users[user, feature])
+            )
+            expected_movie_change = (
+                model.learn_rate * (error * model.users[user, feature]
+                                    - model.k_factor * model.movies[movie, feature])
+            )
             expected_users[user, feature] += expected_user_change
             expected_movies[movie, feature] += expected_movie_change
             model.update_user_and_movie(user, movie, feature, error)
             actual_users = model.users
             actual_movies = model.movies
-            np.testing.assert_array_equal(actual_users, expected_users)
-            np.testing.assert_array_equal(actual_movies, expected_movies)
+            np.testing.assert_array_almost_equal(actual_users, expected_users)
+            np.testing.assert_array_almost_equal(actual_movies, expected_movies)
