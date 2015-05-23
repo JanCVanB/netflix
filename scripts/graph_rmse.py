@@ -135,8 +135,6 @@ def get_figure_and_axes_for_epoch_vs_learn(info):
     figure.canvas.set_window_title(title)
     axes = figure.add_subplot(111, projection='3d')
     axes.get_xaxis().set_major_locator(MaxNLocator(integer=True))
-    # TODO: learning rate locator
-    # axes.get_yaxis().set_major_locator(MaxNLocator(integer=True))
     axes.set_title(title)
     axes.set_xlabel('Number of Epochs')
     axes.set_ylabel('Learning Rate')
@@ -151,8 +149,6 @@ def get_figure_and_axes_for_feature_vs_learn(info):
     figure.canvas.set_window_title(title)
     axes = figure.add_subplot(111, projection='3d')
     axes.get_xaxis().set_major_locator(MaxNLocator(integer=True))
-    # TODO: learning rate locator
-    # axes.get_yaxis().set_major_locator(MaxNLocator(integer=True))
     axes.set_title(title)
     axes.set_xlabel('Number of Features')
     axes.set_ylabel('Learning Rate')
@@ -214,7 +210,6 @@ def sorted_minima(xs, ys, zs):
         else:
             minimum_points.append(new_point)
     sorted_minimum_points = sorted(minimum_points)
-    print(sorted_minimum_points)
     xs, ys, zs = zip(*sorted_minimum_points)
     return xs, ys, zs
 
