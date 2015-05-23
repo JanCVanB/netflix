@@ -11,22 +11,11 @@ NUMBER_OF_FEATURES = 50
 TRAIN_SET_NAME = 'base'
 TEST_SET_NAME = 'probe'
 
-feature_epoch = False
-euclidean = False
-create_files = True
-run_multi = False
-run_c = True
-if len(sys.argv) > 1:
-    if 'order' in sys.argv:
-        feature_epoch = True
-    if 'euclidean' in sys.argv:
-        euclidean = True
-    if 'nofile' in sys.argv:
-        create_files = False
-    if 'multi' in sys.argv:
-        run_multi = True
-    if 'noc' in sys.argv:
-        run_c = False
+feature_epoch = 'order' in sys.argv
+euclidean = 'euclidean' in sys.argv
+create_files = 'nofile' not in sys.argv
+run_multi = 'multi' in sys.argv
+run_c = 'noc' not in sys.argv
 if euclidean:
     model = SVDEuclidean(learn_rate=0.001, num_features=NUMBER_OF_FEATURES)
 else:
