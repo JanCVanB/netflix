@@ -51,7 +51,7 @@ def get_points(rmse_file_paths):
             for epoch, line in enumerate(rmse_file):
                 points.append(Point(epoch=epoch + 1,
                                     feature=result.info.num_features,
-                                    learning_rate=result.info.learning_rate,
+                                    learn_rate=result.info.learn_rate,
                                     rmse=float(line.strip())))
     return points
 
@@ -76,21 +76,21 @@ class ResultInfo:
         self.time = info_dict['time']
         self.num_epochs = info_dict['num_epochs']
         self.num_features = info_dict['num_features']
-        self.learning_rate = info_dict['learning_rate']
+        self.learn_rate = info_dict['learn_rate']
         self.train_set_name = info_dict['train_set_name']
         self.test_set_name = info_dict['test_set_name']
 
 
 class Point:
-    def __init__(self, epoch, feature, learning_rate, rmse):
+    def __init__(self, epoch, feature, learn_rate, rmse):
         self.epoch = epoch
         self.feature = feature
-        self.learning_rate = learning_rate
+        self.learn_rate = learn_rate
         self.rmse = rmse
 
     def __repr__(self):
         return ('Epoch {e}, Feature {f}, Learn {lr}, RMSE {r}'
-                .format(e=self.epoch, f=self.feature, lr=self.learning_rate,
+                .format(e=self.epoch, f=self.feature, lr=self.learn_rate,
                         r=self.rmse))
 
 
@@ -100,7 +100,7 @@ def graph_all_surfaces(info, points):
     figure_f_vs_l, axes_f_vs_l = get_figure_and_axes_for_feature_vs_learn(info)
     epochs = [point.epoch for point in points]
     features = [point.feature for point in points]
-    learns = [point.learning_rate for point in points]
+    learns = [point.learn_rate for point in points]
     rmses = [point.rmse for point in points]
     graph_surface(figure_e_vs_f, axes_e_vs_f, epochs, features, rmses)
     graph_surface(figure_e_vs_l, axes_e_vs_l, epochs, learns, rmses)
