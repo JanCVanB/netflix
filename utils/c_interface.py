@@ -72,9 +72,7 @@ def c_svd_euclidean_train_epoch(train_points, users, user_offsets, movies,
         c_void_p(movies.ctypes.data),          # (void*) movies
         c_void_p(movie_averages.ctypes.data),  # (void*) movie_averages
         c_int32(num_movies),                   # (int)   num_movies
-#        c_void_p(residuals.ctypes.data),       # (void*) residuals
         c_float(learn_rate),                   # (float) learn_rate
-#        c_int32(feature),                      # (int)   feature
         c_int32(num_features),                 # (int)   num_features
         c_float(k_factor)                      # (float) k_factor
     )

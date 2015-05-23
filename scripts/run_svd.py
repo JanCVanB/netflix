@@ -34,9 +34,13 @@ else:
 model.run_c = run_c
 
 try:
-    run(model, TRAIN_SET_NAME, TEST_SET_NAME,
-        epochs=NUMBER_OF_EPOCHS, features=NUMBER_OF_FEATURES,
-        feature_epoch_order=feature_epoch, create_files=create_files,
+    run(model=model,
+        train_set_name=TRAIN_SET_NAME,
+        test_set_name=TEST_SET_NAME,
+        epochs=NUMBER_OF_EPOCHS,
+        features=NUMBER_OF_FEATURES,
+        feature_epoch_order=feature_epoch,
+        create_files=create_files,
         run_multi=run_multi)
 except Exception as the_exception:
     import pdb

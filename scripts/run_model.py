@@ -7,8 +7,6 @@ sys.path.append(abspath(dirname(dirname(__file__))))
 from utils.data_io import load_numpy_array_from_file
 from utils.data_stats import load_stats_from_file
 from utils.data_paths import DATA_DIR_PATH, RESULTS_DIR_PATH
-from algorithms.svd import SVD
-from algorithms.svd_euclidean import SVDEuclidean
 
 
 def calculate_rmse(true_ratings, predictions):

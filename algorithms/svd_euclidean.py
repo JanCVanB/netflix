@@ -36,8 +36,8 @@ class SVDEuclidean(SVD):
             else:
                 self.train_epoch()
 
-    def train_more(self, train_set=None, epochs=1):
-        if train_set is not None:
+    def train_more(self, train_points=None, epochs=1):
+        if train_points is not None:
             self.set_train_points(train_points)
         for epoch in range(epochs):
             if self.run_c:
