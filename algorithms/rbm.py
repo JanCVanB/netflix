@@ -21,7 +21,7 @@ class RBM(algorithms.model.Model):
     def train(self, train_points, number_of_epochs=1):
         self.set_train_points(train_points)
         self.initialize_weights()
-        self.run_multiple_epochs(number_of_epochs)
+        self.run_all_epochs(number_of_epochs)
 
     def set_train_points(self, train_points):
         self.train_points = train_points
@@ -33,9 +33,9 @@ class RBM(algorithms.model.Model):
         self.hidden_biases = numpy.zeros(self.num_hidden)
         self.visible_biases = numpy.zeros(self.num_visible)
 
-    def run_multiple_epochs(self, number_of_epochs):
+    def run_all_epochs(self, number_of_epochs):
         for epoch in range(number_of_epochs):
-            self.run_one_epoch()
+            self.run_all_batches()
 
     def run_one_epoch(self):
         pos_hid_probs, pos_hid_states = self.positive_cd_results()

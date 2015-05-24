@@ -77,7 +77,7 @@ def test_rbm_train_initializes_weights():
     model = algorithms.rbm.RBM()
     model.initialize_weights = MockToTrack()
     model.set_train_points = MockToSkip()
-    model.run_multiple_epochs = MockToSkip()
+    model.run_all_epochs = MockToSkip()
     model.train(train_points=None)
     assert model.initialize_weights.call_count == 1
 
@@ -87,7 +87,7 @@ def test_rbm_train_sets_training_points():
     model = algorithms.rbm.RBM()
     model.initialize_weights = MockToSkip()
     model.set_train_points = MockToTrack()
-    model.run_multiple_epochs = MockToSkip()
+    model.run_all_epochs = MockToSkip()
     model.train(train_points=train_points)
     model.set_train_points.assert_called_once_with(train_points)
 
@@ -97,9 +97,9 @@ def test_rbm_train_runs_default_number_of_epochs():
     model = algorithms.rbm.RBM()
     model.initialize_weights = MockToSkip()
     model.set_train_points = MockToSkip()
-    model.run_multiple_epochs = MockToTrack()
+    model.run_all_epochs = MockToTrack()
     model.train(train_points=None)
-    model.run_multiple_epochs.assert_called_once_with(default_number_of_epochs)
+    model.run_all_epochs.assert_called_once_with(default_number_of_epochs)
 
 
 def test_rbm_train_runs_custom_number_of_epochs():
@@ -107,10 +107,10 @@ def test_rbm_train_runs_custom_number_of_epochs():
     model = algorithms.rbm.RBM()
     model.initialize_weights = MockToSkip()
     model.set_train_points = MockToSkip()
-    model.run_multiple_epochs = MockToTrack()
+    model.run_all_epochs = MockToTrack()
     for custom_number_of_epochs in custom_numbers_of_epochs:
         model.train(train_points=None, number_of_epochs=custom_number_of_epochs)
-        model.run_multiple_epochs.assert_called_with(custom_number_of_epochs)
+        model.run_all_epochs.assert_called_with(custom_number_of_epochs)
 
 
 def test_rbm_set_train_points_sets_same_train_points_passed_to_it():
@@ -176,14 +176,18 @@ def test_rbm_initialize_weights_and_biases_sets_expected_visible_bias_zeros():
                                      expected_visible_biases)
 
 
-def test_rbm_run_multiple_epochs_runs_one_epoch_n_times_for_n_epochs():
+def test_rbm_run_all_epochs_runs_all_batches_n_times_for_n_epochs():
     numbers_of_epochs = 2, 3, 10
     model = algorithms.rbm.RBM()
-    model.run_one_epoch = MockToTrack()
+    model.run_all_batches = MockToTrack()
     for number_of_epochs in numbers_of_epochs:
-        model.run_multiple_epochs(number_of_epochs=number_of_epochs)
-        assert model.run_one_epoch.call_count == number_of_epochs
-        model.run_one_epoch.reset_mock()
+        model.run_all_epochs(number_of_epochs=number_of_epochs)
+        assert model.run_all_batches.call_count == number_of_epochs
+        model.run_all_batches.reset_mock()
+
+
+def test_rbm_run_all_batches_runs_each_batch_once():
+    assert False
 
 
 # TODO: rename "positive associations"?
