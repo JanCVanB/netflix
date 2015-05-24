@@ -70,10 +70,6 @@ class Result:
 
 class ResultInfo:
     def __init__(self, info_dict):
-        self.algorithm = info_dict['algorithm']
-        self.last_commit = info_dict['last_commit']
-        self.name = info_dict['name']
-        self.time = info_dict['time']
         self.num_epochs = info_dict['num_epochs']
         self.num_features = info_dict['num_features']
         self.learn_rate = info_dict['learn_rate']
