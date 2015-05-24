@@ -204,6 +204,7 @@ def graph_surface(figure, axes, xs, ys, rmse_values):
                    min_rmse_x_value, min_rmse_y_value, min_rmse_value,
                    min_rmse_color)
 
+
 def sorted_minima(xs, ys, zs):
     points = zip(xs, ys, zs)
     unique_points = set(points)
@@ -219,6 +220,7 @@ def sorted_minima(xs, ys, zs):
     sorted_minimum_points = sorted(minimum_points)
     xs, ys, zs = zip(*sorted_minimum_points)
     return xs, ys, zs
+
 
 def get_one_below_and_one_above(x):
     delta = math.pow(10, math.floor(math.log10(x)))
