@@ -35,7 +35,6 @@ try:
         create_files=create_files,
         run_multi=run_multi)
 except Exception as the_exception:
-    raise the_exception
     import pdb
     local_exception = the_exception
     pdb.set_trace()
