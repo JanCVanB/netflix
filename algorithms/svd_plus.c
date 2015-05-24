@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <math.h>
 
+float compute_implicit_preferences_sum(int num_points, float *implicit_preferences_cursor);
 
 int c_run_svd_plus_epoch(
         int *train_points, int num_points,
         float *users, float *user_offsets, int *user_rating_count, int num_users,
         float *movies, float* movie_averages, int *movie_rating_count, int num_movies,
         float *similarity_matrix_rated, int num_neighbors,   // assume similarity matrix is sorted 2dimensional
-        float *similarity_matrix_not_rated,           // similar movies not rated by user u
-        int *user_rating_for_similar,                  // matrix of user and their ratings for k similar movies
-        float *implicit_preference,
+        int *nearest_neighbors_matrix,
+        float *implicit_preferences,
         float *explicit_feedback,
         float *implicit_feedback,
         int num_features,
@@ -59,7 +59,7 @@ int c_run_svd_plus_epoch(
     //          - (feedback_k_factor * explicit_feedback[i][j])
 
 
-	int p, f, j;                                            /* loop indices */
+	int p, f, j, code_index;                                        /* loop indices */
 
 	float prediction, feature_product;                      /* prediction variables */
 	float implicit_preferences_sum, user_implicit_preferences_sum;
@@ -79,6 +79,7 @@ int c_run_svd_plus_epoch(
 	int *user,*movie,*time,*rating;                         /* actual test point values */
     int *current_user;                                      /* pointer to the head of a user's ratings */
     int similar_movie;
+    int binary_encoding;
 
 
 
@@ -114,26 +115,32 @@ int c_run_svd_plus_epoch(
                                                * (num_movies - user_rating_count[*user]);
 
         /********************** Sum( R^k( (r_uj - b_uj) * w_ij ) ) *****************************/
+        /**********************  Sum for N^k(u) { c_ij } ***************************************/
         // sum of all the ratings by user (u) within the neighbor (up to k)
         explicit_feedback_sum = 0;
         num_explicit_neighbors = 0;
-        for(j=0; j < num_neighbors; j++){
-            similar_movie = similarity_matrix_rated[*movie][j]; // get next most similar movie
-            //if(current_user[4*j + 1] == similar_movie)
-            explicit_feedback_sum += (user_rating_for_similar[*current_user][j]
-                - (user_offsets[*current_user] + movie_averages[similar_movie]))
-                * explicit_feedback[*current_user][similar_movie];
-            num_explicit_neighbors++:
-        }
-
-        /**********************  Sum for N^k(u) { c_ij } ***************************************/
         implicit_feedback_sum = 0;
         num_implicit_neighbors = 0;
-        for(j=0; j< num_neighbors; J++){
-            similar_movie = similarity_matrix_not_rated[*movie][j];
-            implicit_feedback_sum += implicit_feedback[*movie][similar_movie];
-            num_implicit_neighbors++;
+        code_index = 0;
+        for(j = 0; j < num_neighbors; j++){
+            if(j % 32 == 0){
+                binary_encoding = nearest_neighbors_matrix[p*10 + code_index];
+                code_index++;
+            }
+            if(binary_encoding & 0x8000 == 1){ /* Add to R^k(u) if rated, N^k(u) if not rated */
+                similar_movie = similarity_matrix_rated[(*movie * num_neighbors) + j]; // get next most similar movie
+                explicit_feedback_sum += (user_rating_for_similar[(*current_user  + j]
+                    - (user_offsets[*current_user] + movie_averages[similar_movie]))
+                    * explicit_feedback[*current_user][similar_movie];
+                num_explicit_neighbors++:
+            }else{
+                similar_movie = similarity_matrix_rated[*movie][j];
+                implicit_feedback_sum += implicit_feedback[*movie][similar_movie];
+                num_implicit_neighbors++;
+            }
+            binary_encoding = binary_encoding << 1;
         }
+
 
         /*********************** Prediction calculations ****************************************/
 
