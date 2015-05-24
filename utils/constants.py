@@ -38,3 +38,6 @@ SVD_FEATURE_VALUE_INITIAL = 0.01
 
 BLENDING_RATIO = 25
 """Blending ratio (K) described by funny to blend global mean and movie mean"""
+
+K_NEIGHBORS = 300
+"""Number of nearest neighbors to use in SVD++ """
