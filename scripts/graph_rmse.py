@@ -1,5 +1,16 @@
 """Graph prediction results from the file paths in the command-line arguments
 
+Produces three graphs:
+
+- RMSE surface over epochs vs. features
+- RMSE surface over epochs vs. learning rates
+- RMSE surface over features vs. learning rates
+
+Every graph shows the minimum RMSE value for each x, y point
+If the third parameter also varies over the same space,
+this might produce misleading or disjointed surfaces
+(This was chosen instead of drawing multiple surfaces or all z-values)
+
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 """
 import json

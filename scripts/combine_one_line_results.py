@@ -1,8 +1,17 @@
+"""Combine multiple one-epoch results files into one all-epoch result file
+
+Takes multiple file paths as command line arguments
+Uses last file path argument as the output file path
+Warns user if the input files are not exactly every epoch file required
+Warns user if the output file already exists
+
+.. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
+"""
 import os
 import sys
 
 
-NUM_UNDERSCORES_BEFORE_EPOCH_VALUE = 2
+NUM_PATH_UNDERSCORES_BEFORE_EPOCH_VALUE = 2
 
 
 input_file_paths = sys.argv[1:-1]
@@ -14,7 +23,7 @@ for rmse_file_path in input_file_paths:
     with open(rmse_file_path, 'r') as rmse_file:
         rmse_value = float(rmse_file.read().strip())
     rmse_file_path_parts = rmse_file_path.split('_')
-    epochs_part = rmse_file_path_parts[NUM_UNDERSCORES_BEFORE_EPOCH_VALUE]
+    epochs_part = rmse_file_path_parts[NUM_PATH_UNDERSCORES_BEFORE_EPOCH_VALUE]
     epoch = int(epochs_part[:epochs_part.index('epochs')])
     rmse_values_by_epoch[epoch] = rmse_value
 
@@ -27,7 +36,9 @@ if len(diff) > 1:
     raise Exception('Missing epochs: {}'
                     .format(', '.join([str(x) for x in diff])))
 if len(input_file_paths) > len(expected_epochs):
-    raise Exception('Too many epochs - any extra files?\n{}'
+    raise Exception('Too many epochs - any extra files?\n'
+                    '{}\n'
+                    'Too many epochs - any extra files?'
                     .format('\n'.join(input_file_paths)))
 
 
