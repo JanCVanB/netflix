@@ -74,7 +74,7 @@ class DataStats():
 
 
     def compute_similarity_coefficient(self, similarity_factor=100):
-        movie_averages = np.divide(self.movie_rating_sum, self.movie_rating_count)
+        movie_averages = np.append(0, np.divide(self.movie_rating_sum[1:], self.movie_rating_count[1:]))
         std_deviation = self.compute_standard_deviation()
         rating_y_index = 0
         for movie_y in range(self.num_movies):
@@ -116,6 +116,7 @@ class DataStats():
                     """print('Correlation factor_second #{}'.format(correlation_factor))"""
                 self.similarity_coefficient[movie_y, movie_x] = num_similar_ratings * correlation_factor / (num_similar_ratings + similarity_factor)
             rating_y_index += self.movie_rating_count[movie_y]
+        print('Similarity coefficient matrix #{}'.format(self.similarity_coefficient))
 
 
     def compute_nearest_neighbors(self):
@@ -128,18 +129,13 @@ class DataStats():
                 current_user = self.data_set[training_index, USER_INDEX]
                 current_user_index = training_index
             movie_of_rating = self.data_set[training_index, MOVIE_INDEX]
-            print('Move_rating is : #{}'.format(movie_of_rating))
             movie_similarity = self.similarity_coefficient[:, movie_of_rating]
-            print('Similarity array  is : #{}'.format(movie_similarity))
             sorted_similarity_indices = np.argsort(movie_similarity)
-            print('Sorted indices are : #{}'.format(sorted_similarity_indices))
             for neighbor_index in range(K_NEIGHBORS):
                 user_rating_index = current_user_index
                 if neighbor_index >= self.num_movies:
                     break
-                print('User_rating_index is : #{}'.format(user_rating_index))
                 for user_rating_offset in range(self.user_rating_count[current_user]):
-                    print('User_rating_offset is : #{}'.format(user_rating_offset))
                     if self.data_set[user_rating_index+user_rating_offset, MOVIE_INDEX] == sorted_similarity_indices[neighbor_index]:
                         user_ratings_of_similar_movies[neighbor_index] = 1
                         break
@@ -148,6 +144,9 @@ class DataStats():
                     #TODO optimize by realizing user ratings are in numerical order
             encoded_rating_binary = self.encode_nearest_neighbors(user_ratings_of_similar_movies)
             self.similarity_matrix_rated[training_index, :] = encoded_rating_binary
+            if training_index % 1000000 == 0:
+                print('Computing nearest neighbor of index #{}'.format(training_index))
+                print('Encoded binary ratings array #{}'.format(encoded_rating_binary))
 
 
     def encode_nearest_neighbors(self, user_rated__binary_array):
@@ -161,15 +160,13 @@ class DataStats():
             encoded_rated_binary_array[current_integer_slot] = current_code
             if binary_rating % 32 == 0 and binary_rating != 0:
                 current_integer_slot += 1
-
-        print('Encoded binary array is : #{}'.format(encoded_rated_binary_array))
         return encoded_rated_binary_array
 
 
     def compute_standard_deviation(self):
         std_deviation = np.zeros(shape=(self.num_movies,), dtype=np.float32)
-        movie_averages_squared = np.divide(self.movie_rating_sum, self.movie_rating_count) ** 2
-        movie_squared_averages = np.divide(self.movie_rating_squared_sum, self.movie_rating_count)
+        movie_averages_squared = np.append(0, np.divide(self.movie_rating_sum[1:], self.movie_rating_count[1:]) ** 2)
+        movie_squared_averages = np.append(0, np.divide(self.movie_rating_squared_sum[1:], self.movie_rating_count[1:]))
         np.sqrt(movie_squared_averages - movie_averages_squared, std_deviation)
         return std_deviation
 
