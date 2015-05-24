@@ -1,12 +1,10 @@
-.idea/
+.idea
 *.pyc
 *.swp
 *~
 *.dta
-data/
 data
-lib/
-models/
+lib
 models
-results/
 results
+submissions
