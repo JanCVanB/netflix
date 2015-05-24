@@ -26,8 +26,8 @@ class DataStats():
     def init_movie_and_user_arrays(self):
         self.movie_averages = np.zeros(shape=(self.num_movies,), dtype=np.float32)
         self.movie_rating_count = np.zeros(shape=(self.num_movies,), dtype=np.int32)
-        self.movie_rating_sum = np.zeros(shape=(self.num_movies,))
-        self.movie_rating_squared_sum = np.zeros(shape=(self.num_movies,))
+        self.movie_rating_sum = np.zeros(shape=(self.num_movies,), dtype=np.int32)
+        self.movie_rating_squared_sum = np.zeros(shape=(self.num_movies,), dtype=np.int32)
         self.similarity_coefficient = np.zeros(shape=(self.num_movies, self.num_movies), dtype=np.float32)
         self.similarity_matrix_rated = np.zeros(shape=(len(self.data_set[:, USER_INDEX]),self.rated_code_bytes_needed),
                                                 dtype=np.int32)
