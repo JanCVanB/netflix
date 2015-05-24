@@ -1,6 +1,6 @@
 """Graph prediction results from the file paths in the command-line arguments
 
-Produces three graphs:
+Produce three graphs:
 
 - RMSE surface over epochs vs. features
 - RMSE surface over epochs vs. learning rates

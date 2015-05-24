@@ -1,9 +1,9 @@
 """Combine multiple one-epoch results files into one all-epoch result file
 
-Takes multiple file paths as command line arguments
-Uses last file path argument as the output file path
-Warns user if the input files are not exactly every epoch file required
-Warns user if the output file already exists
+Take multiple file paths as command line arguments
+Use last file path argument as the output file path
+Warn user if the input files are not exactly every epoch file required
+Warn user if the output file already exists
 
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 """
