@@ -28,13 +28,24 @@ def make_simple_test_points():
 
 def make_simple_train_points():
     train_ratings = ((1, 2, 0, 1),
-                     (3, 4, 0, 2),
-                     (5, 1, 0, 3),
-                     (2, 3, 0, 4),
-                     (4, 5, 0, 5),
                      (1, 3, 0, 1),
+                     (2, 3, 0, 4),
+                     (3, 4, 0, 2),
+                     (4, 5, 0, 5),
+                     (5, 1, 0, 3),
                      (5, 2, 0, 2))
     return np.array(train_ratings, dtype=np.int32)
+
+def make_simple_train_points_movie_user():
+    train_ratings = ((1, 5, 0, 3),
+                     (2, 1, 0, 1),
+                     (2, 5, 0, 2),
+                     (3, 1, 0, 1),
+                     (3, 2, 0, 4),
+                     (4, 3, 0, 2),
+                     (5, 4, 0, 5))
+    return np.array(train_ratings, dtype=np.int32)
+
 
 def make_simple_train_points_movie_user():
     train_ratings = ((1, 5, 0, 3),

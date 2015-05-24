@@ -64,11 +64,13 @@ def test_compute_stats_calls_appropriate_functions():
     stats.compute_movie_stats = MockThatTracksCallsWithoutRunning()
     stats.compute_user_stats = MockThatTracksCallsWithoutRunning()
     stats.compute_similarity_coefficient = MockThatTracksCallsWithoutRunning()
+    stats.compute_nearest_neighbors = MockThatTracksCallsWithoutRunning()
     stats.compute_stats()
     assert stats.init_movie_and_user_arrays.call_count == 1
     assert stats.compute_movie_stats.call_count == 1
     assert stats.compute_user_stats.call_count == 1
     assert stats.compute_similarity_coefficient.call_count == 1
+    assert stats.compute_nearest_neighbors.call_count == 1
 
 
 def test_compute_global_average_rating_returns_correct_value():
@@ -254,7 +256,7 @@ def test_compute_similarity_coefficient_returns_correct_values():
     stats.load_data_set(data_set=test_set, mu_data_set=mu_test_set)
     stats.compute_stats()
     test_similarity_matrix = stats.similarity_coefficient
-    expected_similarity_matrix = (np.array([0.0196078, 0], dtype=np.float32), np.array([-0.0235819  , 0.0291262], dtype=np.float32))
+    expected_similarity_matrix = (np.array([0.0196078, -0.0235819], dtype=np.float32), np.array([-0.0235819 , 0.0291262], dtype=np.float32))
     np.testing.assert_almost_equal(test_similarity_matrix,
                                    expected_similarity_matrix)
 
