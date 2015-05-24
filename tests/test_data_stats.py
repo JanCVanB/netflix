@@ -22,10 +22,10 @@ def make_simple_test_set():
 def make_simple_test_set_movie_user():
     test_data_set = np.array([
         [0, 0, 0, 3],
-        [0, 2, 0, 5],
-        [1, 0, 0, 5],
+        [2, 0, 0, 5],
+        [0, 1, 0, 5],
         [1, 1, 0, 4],
-        [1, 2, 0, 2]], dtype=np.int32)
+        [2, 1, 0, 2]], dtype=np.int32)
     return test_data_set
 
 

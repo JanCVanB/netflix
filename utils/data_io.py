@@ -50,6 +50,16 @@ def get_user_movie_time_rating(data_point):
     return user, movie, time, rating
 
 
+def get_movie_user_time_rating(data_point):
+    from utils.constants import (MU_MOVIE_INDEX, RATING_INDEX, TIME_INDEX,
+                                 MU_USER_INDEX)
+    user = data_point[MU_USER_INDEX]
+    movie = data_point[MU_MOVIE_INDEX]
+    time = data_point[TIME_INDEX]
+    rating = data_point[RATING_INDEX]
+    return movie, user, time, rating
+
+
 def hidden_points():
     from utils.constants import HIDDEN_INDEX
     for point in _generate_points_from_index(HIDDEN_INDEX):

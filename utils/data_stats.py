@@ -1,6 +1,6 @@
 import numpy as np
 import pickle
-from utils.constants import MU_MOVIE_INDEX, MU_USER_INDEX, USER_INDEX, MOVIE_INDEX, RATING_INDEX, BLENDING_RATIO, K_NEIGHBORS
+from utils.constants import USER_INDEX, MOVIE_INDEX, RATING_INDEX, BLENDING_RATIO, K_NEIGHBORS
 
 
 class DataStats():
@@ -85,14 +85,14 @@ class DataStats():
                 num_similar_ratings = 0
                 for user_y_count in range(self.movie_rating_count[movie_y]):
                     rating_y_user_index = rating_y_index + user_y_count
-                    user_y = self.mu_data_set[rating_y_user_index, MU_USER_INDEX]
-                    user_x = self.mu_data_set[rating_x_index, MU_USER_INDEX]
+                    user_y = self.mu_data_set[rating_y_user_index, USER_INDEX]
+                    user_x = self.mu_data_set[rating_x_index, USER_INDEX]
                     while (user_y > user_x):
                         rating_x_index += 1
-                        if rating_x_index >= len(self.mu_data_set[:, MU_MOVIE_INDEX]):
+                        if rating_x_index >= len(self.mu_data_set[:, MOVIE_INDEX]):
                             break
-                        if (self.mu_data_set[rating_x_index, MU_MOVIE_INDEX] == movie_x):
-                            user_x = self.mu_data_set[rating_x_index, MU_USER_INDEX]
+                        if (self.mu_data_set[rating_x_index, MOVIE_INDEX] == movie_x):
+                            user_x = self.mu_data_set[rating_x_index, USER_INDEX]
                         else:
                             rating_x_index -= 1
                             break

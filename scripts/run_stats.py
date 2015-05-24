@@ -8,15 +8,18 @@ from utils.data_io import load_numpy_array_from_file
 
 
 def compute_stats_for_data_set_name(name):
-    data_set_path = join(DATA_DIR_PATH, name + '.npy')
+    mu_data_set_path = join(DATA_DIR_PATH, name + '.npy')
+    um_data_set_path = join(DATA_DIR_PATH, name + '_um.npy')
     stats_path = join(DATA_DIR_PATH, name + '_stats.p')
     if isfile(stats_path):
         raise Exception('Stats file already exists! Please delete stats file ' +
                         'to re-compute stats for set: \'{}\''.format(name))
     stats = DataStats()
-    print('Loading data set from {}...'.format(data_set_path))
-    data_set = load_numpy_array_from_file(file_name=data_set_path)
-    stats.load_data_set(data_set)
+    print('Loading um_data set from {}...'.format(um_data_set_path))
+    print('Loading mu_data set from {}...'.format(mu_data_set_path))
+    um_data_set = load_numpy_array_from_file(file_name=um_data_set_path)
+    mu_data_set = load_numpy_array_from_file(file_name=mu_data_set_path)
+    stats.load_data_set(data_set=um_data_set, mu_data_set=mu_data_set)
     print('Computing stats ...')
     stats.compute_stats()
     print('Saving stats to file: {}'.format(stats_path))
