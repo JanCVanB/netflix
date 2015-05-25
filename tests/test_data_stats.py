@@ -12,8 +12,8 @@ MockThatReturnsZeroNumpy = Mock(return_value=np.array([0]))
 
 def make_simple_test_set():
     test_data_set = np.array([
-        [0, 1, 0, 5],
         [0, 0, 0, 3],
+        [0, 1, 0, 5],
         [1, 1, 0, 4],
         [2, 1, 0, 2],
         [2, 0, 0, 5]], dtype=np.int32)
@@ -210,7 +210,7 @@ def test_compute_offsets_returns_correct_array():
         data_indices=test_data[:, MOVIE_INDEX],
         averages=test_averages
     )
-    expected_offsets = np.array([5-(11/3), -1, 4-(11/3), 2-(11/3), 1], dtype=np.float32)
+    expected_offsets = np.array([-1, 5-(11/3), 4-(11/3), 2-(11/3), 1], dtype=np.float32)
     np.testing.assert_almost_equal(test_offsets,
                                    expected_offsets, decimal=6)
 
@@ -240,10 +240,12 @@ def test_compute_std_deviation_returns_correct_values():
     stats = DataStats()
     test_set = make_simple_test_set()
     mu_test_set = make_simple_test_set_movie_user()
+    test_set[:, :2] += 1
+    mu_test_set[:, :2] += 1
     stats.load_data_set(data_set=test_set, mu_data_set=mu_test_set)
     stats.compute_stats()
     test_std_deviation = stats.compute_standard_deviation()
-    expected_std_deviation = np.array([1, 1.2472191], dtype=np.float32)
+    expected_std_deviation = np.array([0, 1, 1.2472191], dtype=np.float32)
     np.testing.assert_almost_equal(test_std_deviation,
                                    expected_std_deviation)
 
@@ -253,10 +255,13 @@ def test_compute_similarity_coefficient_returns_correct_values():
     stats = DataStats()
     test_set = make_simple_test_set()
     mu_test_set = make_simple_test_set_movie_user()
+    test_set[:, :2] += 1
+    mu_test_set[:, :2] += 1
     stats.load_data_set(data_set=test_set, mu_data_set=mu_test_set)
     stats.compute_stats()
     test_similarity_matrix = stats.similarity_coefficient
-    expected_similarity_matrix = (np.array([0.0196078, -0.0235819], dtype=np.float32), np.array([-0.0235819 , 0.0291262], dtype=np.float32))
+    expected_similarity_matrix = (np.array([0, 0, 0]), np.array([0, 0.0196078, -0.0235819], dtype=np.float32), 
+        np.array([0, -0.0235819 , 0.0291262], dtype=np.float32))
     np.testing.assert_almost_equal(test_similarity_matrix,
                                    expected_similarity_matrix)
 
