@@ -115,11 +115,11 @@ class DataStats():
                             self.mu_data_set[rating_y_user_index, RATING_INDEX] -
                             movie_averages[movie_y])
                         num_similar_ratings += 1
-                        print('expected sum #{}'.format(expected_value_sum))
-                        print('movie avg #{}'.format(movie_averages[movie_y]))
-                        print('movie x rating #{}'.format(self.mu_data_set[rating_x_index, RATING_INDEX]))
-                        print('movie y rating #{}'.format(self.mu_data_set[rating_y_user_index, RATING_INDEX]))
-                        print('user #{}'.format(user_x))
+                        #print('expected sum #{}'.format(expected_value_sum))
+                        #print('movie avg #{}'.format(movie_averages[movie_y]))
+                        #print('movie x rating #{}'.format(self.mu_data_set[rating_x_index, RATING_INDEX]))
+                        #print('movie y rating #{}'.format(self.mu_data_set[rating_y_user_index, RATING_INDEX]))
+                        #print('user #{}'.format(user_x))
                 rating_x_index += 1
                 if num_similar_ratings > 0:
                     correlation_factor = expected_value_sum / num_similar_ratings
@@ -129,6 +129,8 @@ class DataStats():
                     print('Correlation factor_second #{}'.format(correlation_factor))
                 self.similarity_coefficient[movie_y, movie_x] = np.absolute(num_similar_ratings * correlation_factor /
                                                                             (num_similar_ratings + similarity_factor))
+            if movie_y % 1000 == 1:
+                print('Similarity coefficient for movie: {}, {}'.format(movie_y, self.similarity_coefficient[movie_y, movie_x]))
             rating_y_index += self.movie_rating_count[movie_y]
         print('Similarity coefficient matrix #{}'.format(self.similarity_coefficient))
 
