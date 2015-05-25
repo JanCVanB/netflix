@@ -49,15 +49,27 @@ class DataStats():
         self.num_users = np.amax(data_set[:, USER_INDEX]) + 1
         self.num_movies = np.amax(data_set[:, MOVIE_INDEX]) + 1
 
+    def load_intermediate_stats(self, file_path):
+        stats = load_stats_from_file(file_path=file_path)
+        self.movie_averages = stats.movie_averages
+        self.movie_rating_count = stats.movie_rating_count
+        self.movie_rating_sum = stats.movie_rating_sum
+        self.movie_rating_squared_sum = stats.movie_rating_squared_sum
+        self.user_rating_count = stats.user_rating_count
+        self.user_offsets_sum = stats.user_offsets_sum
+        self.user_offsets = stats.user_offsets
 
-    def compute_stats(self):
+
+    def compute_stats(self, use_intermediate=False):
         if self.data_set == []:
             raise Exception('No Data set loaded. Please use DataStats.load_data_set' +
                             '(data_set) to load a data set before calling compute_stats')
         else:
-            self.init_movie_and_user_arrays()
-            self.compute_movie_stats()
-            self.compute_user_stats()
+            if not use_intermediate:
+                self.init_movie_and_user_arrays()
+                self.compute_movie_stats()
+                self.compute_user_stats()
+
             #try:
             self.compute_similarity_coefficient()
             print('Finised computing the similarity matrix')
@@ -70,6 +82,27 @@ class DataStats():
              #   //import pdb
               #  //pdb.set_trace()
 
+    def compute_intermediate_stats(self):
+        if self.data_set == []:
+            raise Exception('No Data set loaded. Please use DataStats.load_data_set' +
+                            '(data_set) to load a data set before calling compute_stats')
+        else:
+            self.init_movie_and_user_arrays()
+            self.compute_movie_stats()
+            self.compute_user_stats()
+
+    def compute_further_stats(self):
+        if self.data_set == []:
+            raise Exception('No Data set loaded. Please use DataStats.load_data_set' +
+                            '(data_set) to load a data set before calling compute_stats')
+        else:
+            self.compute_similarity_coefficient()
+            print('Finised computing the similarity matrix')
+             #   import pickle
+             #   with open('similarity_coefficient_dump.pkl', 'wb+') as dump_file:
+            #        pickle.dump(self, dump_file)
+            self.compute_nearest_neighbors()
+            print('Finished computing the nearest neighbors')
 
     def compute_movie_stats(self):
         squared_sum, simple_sum, simple_count = compute_simple_indexed_sum_and_count(
@@ -298,6 +331,20 @@ class DataStats():
         self.mu_data_set = []
         self.similarity_coefficient = []
         pickle.dump(self, file=open(file_path, 'wb'))
+
+    def write_pickle_to_file(self, file_path, keep_self=False):
+        if keep_self:
+            data_set = self.data_set
+            mu_data_set = self.mu_data_set
+        self.data_set = []
+        self.mu_data_set = []
+        self.similarity_coefficient = []
+        self.similarity_matrix_rated = []
+        self.similarity_matrix_sorted = []
+        pickle.dump(self, file=open(file_path, 'wb'))
+        if keep_self:
+            self.data_set = data_set
+            self.mu_data_set = mu_data_set
 
 
 def compute_simple_indexed_sum_and_count(data_indices, data_values):
