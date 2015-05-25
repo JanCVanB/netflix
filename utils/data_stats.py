@@ -127,7 +127,8 @@ class DataStats():
                 if std_deviation[movie_x] > 0 and std_deviation[movie_y] > 0:
                     correlation_factor /= (std_deviation[movie_y] * std_deviation[movie_x])
                     print('Correlation factor_second #{}'.format(correlation_factor))
-                self.similarity_coefficient[movie_y, movie_x] = num_similar_ratings * correlation_factor / (num_similar_ratings + similarity_factor)
+                self.similarity_coefficient[movie_y, movie_x] = np.absolute(num_similar_ratings * correlation_factor /
+                                                                            (num_similar_ratings + similarity_factor))
             rating_y_index += self.movie_rating_count[movie_y]
         print('Similarity coefficient matrix #{}'.format(self.similarity_coefficient))
 
@@ -140,7 +141,7 @@ class DataStats():
                 current_user_index = training_index
             movie_of_rating = self.data_set[training_index, MOVIE_INDEX]
             movie_similarity = self.similarity_coefficient[:, movie_of_rating]
-            sorted_similarity_indices = np.argsort(movie_similarity)
+            sorted_similarity_indices = np.argsort(-movie_similarity)
             movies_the_user_rated = self.data_set[current_user_index:
                                                   current_user_index +
                                                   self.user_rating_count[current_user],

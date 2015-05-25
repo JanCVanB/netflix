@@ -260,8 +260,8 @@ def test_compute_similarity_coefficient_returns_correct_values():
     stats.load_data_set(data_set=test_set, mu_data_set=mu_test_set)
     stats.compute_stats()
     test_similarity_matrix = stats.similarity_coefficient
-    expected_similarity_matrix = (np.array([0, 0, 0]), np.array([0, 0.0196078, -0.0235819], dtype=np.float32), 
-        np.array([0, -0.0235819 , 0.0291262], dtype=np.float32))
+    expected_similarity_matrix = (np.array([0, 0, 0]), np.array([0, 0.0196078, 0.0235819], dtype=np.float32),
+        np.array([0, 0.0235819 , 0.0291262], dtype=np.float32))
     np.testing.assert_almost_equal(test_similarity_matrix,
                                    expected_similarity_matrix)
 
