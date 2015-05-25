@@ -15,30 +15,19 @@ def calculate_rmse(true_ratings, predictions):
     return sqrt(((predictions - true_ratings) ** 2).mean())
 
 
-def predict_and_save_rmse(model, test_points, rmse_file_path):
+def predict_and_save_rmse(model, test_points, rmse_file_path, keep_predictions=False,
+                          predictions_file_name='noname'):
     predictions = model.predict(test_points)
     true_ratings = test_points[:, 3]
     rmse = calculate_rmse(true_ratings, predictions)
     print('RMSE:', rmse)
     save_rmse(rmse, rmse_file_path, append=True)
+    if keep_predictions:
+        save_predictions(predictions, predictions_file_name)
 
 
-def save_model(model, train_set_name, epochs=None, feature_epoch_order=False):
-    date_format = '%b-%d'
-    time_format = '%Hh%Mm'
-    times = strftime(time_format, localtime())
-    times = strftime(time_format, localtime())
-    times += '_to_' + strftime(time_format, localtime())
-    epochs_string = '' if epochs is None else ('_%sepochs' % epochs)
-    features = model.num_features
-    features_string = '' if features is None else ('_%sfeatures' % features)
-    order_string = '' if not feature_epoch_order else '_feature_epoch_order'
-    template_file_name = ('{model_class}_{train}{e}{f}_xxx{order}_{times}'
-                          .format(model_class=model.__class__.__name__,
-                                  train=train_set_name, e=epochs_string,
-                                  f=features_string, order=order_string,
-                                  times=times))
-    model_file_name = template_file_name.replace('xxx', 'model') + '.p'
+def save_model(model, model_file_name):
+    print('Saving model to {}'.format(model_file_name))
     model.save(model_file_name)
 
 
@@ -91,7 +80,7 @@ def run(model, train_set_name, test_set_name, run_name, epochs=None,
     if model.num_features is not None:
         print('Number of features:', model.num_features)
     train_file_path = join(DATA_DIR_PATH, train_set_name + '.npy')
-    stats_file_path = join(DATA_DIR_PATH, train_set_name + '_stats.p')
+    stats_file_path = join(DATA_DIR_PATH, 'old_stats', train_set_name + '_stats.p')
 
     model.debug = True
     train_points = load_numpy_array_from_file(train_file_path)
@@ -119,6 +108,7 @@ def run(model, train_set_name, test_set_name, run_name, epochs=None,
     )
     print('Wrote run info to ', run_info_file_path)
     rmse_file_path = run_info_file_path.replace('info.json', 'rmse.txt')
+    predictions_file_name = run_info_file_path.split('/')[-1].replace('info.json', 'predictions.dta')
     if not run_multi:
         if not feature_epoch_order:
             model.train(train_points, stats=stats, epochs=epochs)
@@ -135,20 +125,24 @@ def run(model, train_set_name, test_set_name, run_name, epochs=None,
             if create_files:
                 print('Predicting "{test}" ratings'.format(test=test_set_name))
                 predict_and_save_rmse(model, test_points=test_points,
-                                      rmse_file_path=rmse_file_path)
+                                      rmse_file_path=rmse_file_path,
+                                      keep_predictions=(create_files and epoch == epochs-1),
+                                      predictions_file_name=predictions_file_name)
     model.train_points = None
-
     if create_files:
-        save_model(model, train_set_name=train_set_name,
-                   epochs=epochs, feature_epoch_order=feature_epoch_order)
+        model_file_name = run_info_file_path.split('/')[-1].replace('info.json', 'model.p')
+        save_model(model, model_file_name)
         if not run_multi:
             # duplicate save if run_multi
             print('Predicting "{test}" ratings'.format(test=test_set_name))
             predict_and_save_rmse(model, test_points=test_points,
-                                  rmse_file_path=rmse_file_path)
+                                  rmse_file_path=rmse_file_path,
+                                  keep_predictions=True,
+                                  predictions_file_name=predictions_file_name)
 
 
 def save_predictions(predictions, predictions_file_name):
+    print('Saving predictions to {}'.format(predictions_file_name))
     predictions_file_path = join(RESULTS_DIR_PATH, predictions_file_name)
     with open(predictions_file_path, 'w+') as predictions_file:
         predictions_file.writelines(['{:.3f}\n'.format(p) for p in predictions])
