@@ -32,11 +32,12 @@ def save_model(model, train_set_name, epochs=None, feature_epoch_order=False):
     epochs_string = '' if epochs is None else ('_%sepochs' % epochs)
     features = model.num_features
     features_string = '' if features is None else ('_%sfeatures' % features)
-    order_string = '' if feature_epoch_order is False else ('_feature_epoch_order')
-    template_file_name = ('{name}_{train}{e}{f}_xxx{order}_{times}'
-                          .format(name=model.__class__.__name__,
+    order_string = '' if not feature_epoch_order else '_feature_epoch_order'
+    template_file_name = ('{model_class}_{train}{e}{f}_xxx{order}_{times}'
+                          .format(model_class=model.__class__.__name__,
                                   train=train_set_name, e=epochs_string,
-                                  f=features_string, order=order_string, times=times))
+                                  f=features_string, order=order_string,
+                                  times=times))
     model_file_name = template_file_name.replace('xxx', 'model') + '.p'
     model.save(model_file_name)
 
@@ -44,8 +45,9 @@ def save_model(model, train_set_name, epochs=None, feature_epoch_order=False):
 def save_run_info(model, test_set_name, train_set_name, date_string,
                   time_string, feature_epoch_order, create_files,
                   epochs, run_multi, run_name, commit):
-    info_file_name = ('{name}_{short_commit}_{run_name}_{start_time}_info.json'
-                      .format(name=model.__class__.__name__,
+    info_file_name = ('{model_class}_{run_name}_{short_commit}_{start_time}'
+                      '_info.json'
+                      .format(model_class=model.__class__.__name__,
                               short_commit=commit[:5],
                               run_name=run_name,
                               start_time=time_string)
@@ -121,7 +123,8 @@ def run(model, train_set_name, test_set_name, run_name, epochs=None,
         if not feature_epoch_order:
             model.train(train_points, stats=stats, epochs=epochs)
         else:
-            model.train_feature_epoch(train_points=train_points, stats=stats, epochs=epochs)
+            model.train_feature_epoch(train_points=train_points, stats=stats,
+                                      epochs=epochs)
     else:
         print("Training multi!")
         for epoch in range(epochs):
