@@ -50,7 +50,9 @@ def get_info(rmse_file_paths):
         if len(value) == 1:
             combined_info_dict[key] = value[0]
         else:
-            combined_info_dict[key] = ' and '.join(str(v) for v in value)
+            value.sort()
+            combined_info_dict[key] = ' and '.join([', '.join(str(v) for v in value[:-1]),
+                                                    str(value[-1])])
     return ResultInfo(combined_info_dict)
 
 
@@ -121,8 +123,10 @@ def graph_all_surfaces(info, points):
 
 
 def get_figure_and_axes_for_epoch_vs_feature(info):
-    title = ('Epochs vs. Features ({train} to {test})'
-             .format(train=info.train_set_name, test=info.test_set_name))
+    title = ('Epochs vs. Features ({train} to {test})\n Learning Rate {lr}'
+             .format(train=info.train_set_name,
+                     test=info.test_set_name,
+                     lr=info.learn_rate))
     figure = plt.figure()
     figure.canvas.set_window_title(title)
     axes = figure.add_subplot(111, projection='3d')
@@ -136,8 +140,10 @@ def get_figure_and_axes_for_epoch_vs_feature(info):
 
 
 def get_figure_and_axes_for_epoch_vs_learn(info):
-    title = ('Epochs vs. Learning Rates ({train} to {test})'
-             .format(train=info.train_set_name, test=info.test_set_name))
+    title = ('Epochs vs. Learning Rates ({train} to {test})\n {f} Features'
+             .format(train=info.train_set_name,
+                     test=info.test_set_name,
+                     f=info.num_features))
     figure = plt.figure()
     figure.canvas.set_window_title(title)
     axes = figure.add_subplot(111, projection='3d')
@@ -150,8 +156,10 @@ def get_figure_and_axes_for_epoch_vs_learn(info):
 
 
 def get_figure_and_axes_for_feature_vs_learn(info):
-    title = ('Features vs. Learning Rates ({train} to {test})'
-             .format(train=info.train_set_name, test=info.test_set_name))
+    title = ('Features vs. Learning Rates ({train} to {test})\n {e} Epochs'
+             .format(train=info.train_set_name,
+                     test=info.test_set_name,
+                     e=info.num_epochs))
     figure = plt.figure()
     figure.canvas.set_window_title(title)
     axes = figure.add_subplot(111, projection='3d')
@@ -230,7 +238,7 @@ def get_one_below_and_one_above(x):
 def annotate_point(figure, axes, x, y, z, color):
     xp1, yp1, _ = proj3d.proj_transform(x, y, z, axes.get_proj())
     label = axes.annotate(
-        '{:.3g}'.format(z), xy=(xp1, yp1), xytext = (-20, 40),
+        '{:.5g}'.format(z), xy=(xp1, yp1), xytext = (-20, 40),
         textcoords = 'offset points', ha = 'right', va = 'bottom',
         bbox = dict(boxstyle='round,pad=0.5', fc=color, alpha=0.5),
         arrowprops = dict(arrowstyle='->', connectionstyle='arc3,rad=0',
