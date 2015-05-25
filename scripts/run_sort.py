@@ -8,9 +8,9 @@ from utils.data_splitting import write_numpy_array_to_file
 import numpy as np
 
 
-def compute_sort_for_data_set(name, include_time=False):
+def compute_sort_for_data_set(name, no_time=False):
     data_set_path = join(DATA_DIR_PATH, name + '.npy')
-    time_string = '' if include_time else '_notime'
+    time_string = '_notime' if no_time else ''
     sort_path = join(DATA_DIR_PATH, name + '_um{}.npy'.format(time_string))
     if isfile(sort_path):
         raise Exception('Sorted file already exists! Please delete sort file ' +
@@ -18,11 +18,11 @@ def compute_sort_for_data_set(name, include_time=False):
     print('Loading data set from {}...'.format(data_set_path))
     data_set = load_numpy_array_from_file(file_name=data_set_path)
     print('Computing sort...')
-    if include_time:
-        keep_columns = (0, 1, 2, 3)
-    else:
+    if no_time:
         print('(Excluding time from final numpy)')
         keep_columns = (0, 1, 3)
+    else:
+        keep_columns = (0, 1, 2, 3)
     sorted_set = np.sort(data_set.view('i4,i4,i4,i4'),
                          order=['f0', 'f1'],
                          kind='mergesort',
@@ -40,5 +40,5 @@ if __name__ == '__main__':
         print('\n\t\tDATASET_NAME is the prefix of any of the .npy data files in /netflix/data.')
         print('\n\tEx: python3 scripts/run_sort.py valid\n')
     else:
-        include_time = False if 'notime' in sys.argv else True
-        compute_sort_for_data_set(name=sys.argv[1], include_time=include_time)
+        compute_sort_for_data_set(name=sys.argv[1],
+                                  no_time=('notime' in sys.argv))
