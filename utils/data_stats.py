@@ -133,46 +133,30 @@ class DataStats():
                     break
                 with ThreadPoolExecutor(max_workers=8) as e:
                     if rating_x_index < num_points and rating_y_index < num_points:
-                        e.submit(self.compute_movie_similarity, rating_y_index, movie_y, movie_averages[movie_y],
-                                 std_deviation[movie_y],rating_x_index, movie_x, movie_averages[movie_x],
-                                 std_deviation[movie_x])
+                        e.submit(self.compute_movie_similarity, movie_y, movie_x)
                         rating_x_index += self.movie_rating_count[movie_x]
                         movie_x += 1
                     if rating_x_index < num_points and rating_y_index < num_points and movie_x < self.num_movies:
-                        e.submit(self.compute_movie_similarity, rating_y_index, movie_y, movie_averages[movie_y],
-                                 std_deviation[movie_y],rating_x_index, movie_x, movie_averages[movie_x],
-                                 std_deviation[movie_x])
+                        e.submit(self.compute_movie_similarity, movie_y, movie_x)
                         rating_x_index += self.movie_rating_count[movie_x]
                         movie_x += 1
                     if rating_x_index < num_points and rating_y_index < num_points and movie_x < self.num_movies:
-                        e.submit(self.compute_movie_similarity, rating_y_index, movie_y, movie_averages[movie_y],
-                                 std_deviation[movie_y],rating_x_index, movie_x, movie_averages[movie_x],
-                                 std_deviation[movie_x])
+                        e.submit(self.compute_movie_similarity, movie_y, movie_x)
                         rating_x_index += self.movie_rating_count[movie_x]
                     if rating_x_index < num_points and rating_y_index < num_points and movie_x < self.num_movies:
-                        e.submit(self.compute_movie_similarity, rating_y_index, movie_y, movie_averages[movie_y],
-                                 std_deviation[movie_y],rating_x_index, movie_x, movie_averages[movie_x],
-                                 std_deviation[movie_x])
+                        e.submit(self.compute_movie_similarity, movie_y, movie_x)
                         rating_x_index += self.movie_rating_count[movie_x]
                     if rating_x_index < num_points and rating_y_index < num_points and movie_x < self.num_movies:
-                        e.submit(self.compute_movie_similarity, rating_y_index, movie_y, movie_averages[movie_y],
-                                 std_deviation[movie_y],rating_x_index, movie_x, movie_averages[movie_x],
-                                 std_deviation[movie_x])
+                        e.submit(self.compute_movie_similarity, movie_y, movie_x)
                         rating_x_index += self.movie_rating_count[movie_x]
                     if rating_x_index < num_points and rating_y_index < num_points and movie_x < self.num_movies:
-                        e.submit(self.compute_movie_similarity, rating_y_index, movie_y, movie_averages[movie_y],
-                                 std_deviation[movie_y],rating_x_index, movie_x, movie_averages[movie_x],
-                                 std_deviation[movie_x])
+                        e.submit(self.compute_movie_similarity, movie_y, movie_x)
                         rating_x_index += self.movie_rating_count[movie_x]
                     if rating_x_index < num_points and rating_y_index < num_points and movie_x < self.num_movies:
-                        e.submit(self.compute_movie_similarity, rating_y_index, movie_y, movie_averages[movie_y],
-                                 std_deviation[movie_y],rating_x_index, movie_x, movie_averages[movie_x],
-                                 std_deviation[movie_x])
+                        e.submit(self.compute_movie_similarity, movie_y, movie_x)
                         rating_x_index += self.movie_rating_count[movie_x]
                     if rating_x_index < num_points and rating_y_index < num_points and movie_x < self.num_movies:
-                        e.submit(self.compute_movie_similarity, rating_y_index, movie_y, movie_averages[movie_y],
-                                 std_deviation[movie_y],rating_x_index, movie_x, movie_averages[movie_x],
-                                 std_deviation[movie_x])
+                        e.submit(self.compute_movie_similarity, movie_y, movie_x)
                         rating_x_index += self.movie_rating_count[movie_x]
                     e.shutdown(wait=True)
             #if movie_y % 1000 == 1:
@@ -183,20 +167,23 @@ class DataStats():
         print('Similarity coefficient matrix #{}'.format(self.similarity_coefficient))
 
 
-    def compute_movie_similarity(self, rating_y_index, movie_y, y_average, y_std_dev,
-                                 rating_x_index, movie_x, x_average, x_std_dev, similarity_factor=100):
-        correlation_factor = 0
-        expected_value_sum = 0
-        num_similar_ratings = 0
-        num_points = len(self.mu_data_set[:, MOVIE_INDEX])
-        for user_y_count in range(self.movie_rating_count[movie_y]):
-            rating_y_user_index = rating_y_index + user_y_count
-            if rating_x_index >= num_points:
-                break
-            if rating_y_user_index >= num_points:
-                break
-            user_y = self.mu_data_set[rating_y_user_index, USER_INDEX]
-            user_x = self.mu_data_set[rating_x_index, USER_INDEX]
+    def compute_movie_similarity(self, movie_y, movie_x):
+        #correlation_factor = 0
+        #expected_value_sum = 0
+        #num_similar_ratings = 0
+        #num_points = len(self.mu_data_set[:, MOVIE_INDEX])
+        num_y_ratings = self.movie_rating_count[movie_y]
+        num_x_ratings = self.movie_rating_count[movie_x]
+
+        self.similarity_coefficient[movie_y, movie_x] = np.absolute(num_y_ratings - num_x_ratings)
+        #for user_y_count in range(num_y_ratings):
+         #   rating_y_user_index = rating_y_index + user_y_count
+         #   if rating_x_index >= num_points:
+         #       break
+         #   if rating_y_user_index >= num_points:
+         #       break
+         #   user_y = self.mu_data_set[rating_y_user_index, USER_INDEX]
+         #   user_x = self.mu_data_set[rating_x_index, USER_INDEX]
 
             # have user_y rated movie_y: [10]
             # have list of user_x's who rated movie_x[1, 4, 5, 10, 12]
@@ -216,21 +203,7 @@ class DataStats():
        #         print('User_y_index_for_movie_x #{}'.format(user_y_index_for_movie_x))
        #     except ValueError:
         #        expected_value_sum += 0
-            while (user_y > user_x):
-                rating_x_index += 1
-                if rating_x_index >= num_points:
-                    break
-                if (self.mu_data_set[rating_x_index, MOVIE_INDEX] == movie_x):
-                    user_x = self.mu_data_set[rating_x_index, USER_INDEX]
-                else:
-                    rating_x_index -= 1
-                    break
-            if user_x == user_y:
-                #expected_value_sum += (self.mu_data_set[rating_x_index, RATING_INDEX] +
-                #    -x_average) * (
-                #    self.mu_data_set[rating_y_user_index, RATING_INDEX])
-                #    - y_average)
-                num_similar_ratings += 1
+            
                 #print('expected sum #{}'.format(expected_value_sum))
                 #print('movie avg #{}'.format(movie_averages[movie_y]))
                 #print('movie x rating #{}'.format(self.mu_data_set[rating_x_index, RATING_INDEX]))
@@ -243,7 +216,6 @@ class DataStats():
         #    correlation_factor /= (y_std_dev * x_std_dev)
         #    print('Correlation factor_second #{}'.format(correlation_factor))
         #self.similarity_coefficient[movie_y, movie_x] = expected_value_sum / (num_similar_ratings + similarity_factor)
-        self.similarity_coefficient[movie_y, movie_x] = num_similar_ratings
 
 
     def compute_nearest_neighbors(self):
@@ -255,7 +227,7 @@ class DataStats():
                 current_user_index = training_index
             movie_of_rating = self.data_set[training_index, MOVIE_INDEX]
             movie_similarity = self.similarity_coefficient[:, movie_of_rating]
-            sorted_similarity_indices = np.argsort(-movie_similarity)
+            sorted_similarity_indices = np.argsort(movie_similarity)
             movies_the_user_rated = self.data_set[current_user_index:
                                                   current_user_index +
                                                   self.user_rating_count[current_user],
