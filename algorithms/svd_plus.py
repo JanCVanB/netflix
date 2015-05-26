@@ -34,6 +34,8 @@ class SVD_Plus(SVD):
 
     def set_train_points(self, train_points):
         self.train_points = train_points
+        self.num_train_points = train_points.shape[0] + 1
+
 
 
     def calculate_prediction(self, user, movie):

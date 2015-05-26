@@ -203,7 +203,7 @@ class DataStats():
        #         print('User_y_index_for_movie_x #{}'.format(user_y_index_for_movie_x))
        #     except ValueError:
         #        expected_value_sum += 0
-            
+
                 #print('expected sum #{}'.format(expected_value_sum))
                 #print('movie avg #{}'.format(movie_averages[movie_y]))
                 #print('movie x rating #{}'.format(self.mu_data_set[rating_x_index, RATING_INDEX]))
