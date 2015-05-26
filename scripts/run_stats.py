@@ -33,17 +33,17 @@ def compute_stats_for_data_set_name(name, use_intermediate=False, fraction=0):
             stats.compute_intermediate_stats()
             stats.write_pickle_to_file(intermediate_stats_path, keep_data=True)
     print('Computing stats ...')
-    stats.compute_stats(use_intermediate=use_intermediate, fraction=fraction, num_pieces=4)
+    stats.compute_stats(use_intermediate=use_intermediate, fraction=fraction, num_pieces=20)
     print('Saving stats to file: {}'.format(stats_path))
     stats.write_stats_to_file(file_path=stats_path)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 4:
         print('\n\tUSAGE:\n')
         print('\tpython3 scripts/run_stats.py DATASET_NAME (TRUE/FALSE)')
         print('\n\t\tDATASET_NAME is the prefix of any of the .npy data files in /netflix/data.')
         print('\n\t\tT/F is whether to use intermediates stats')
         print('\n\tEx: python3 scripts/run_stats.py valid\n')
     else:
-        compute_stats_for_data_set_name(name=sys.argv[1], use_intermediate=sys.argv[2], fraction=sys.argv[3])
+        compute_stats_for_data_set_name(name=sys.argv[1], use_intermediate=sys.argv[2], fraction=int(sys.argv[3]))
