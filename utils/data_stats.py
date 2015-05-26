@@ -58,9 +58,11 @@ class DataStats():
         self.user_rating_count = stats.user_rating_count
         self.user_offsets_sum = stats.user_offsets_sum
         self.user_offsets = stats.user_offsets
+        self.similarity_coefficient = stats.similarity_coefficient
+        self.similarity_matrix_rated = stats.similarity_matrix_rated
+        self.similarity_matrix_sorted = stats.similarity_matrix_sorted
 
-
-    def compute_stats(self, use_intermediate=False):
+    def compute_stats(self, use_intermediate=False, fraction=0, num_pieces=1):
         if self.data_set == []:
             raise Exception('No Data set loaded. Please use DataStats.load_data_set' +
                             '(data_set) to load a data set before calling compute_stats')
@@ -70,9 +72,15 @@ class DataStats():
                 self.compute_movie_stats()
                 self.compute_user_stats()
 
-            #try:
-            self.compute_similarity_coefficient()
-            print('Finised computing the similarity matrix')
+            if fraction == 0:
+                self.compute_similarity_coefficient()
+            else:
+                num_items = self.num_movies / num_pieces
+                start_index = num_items * fraction
+                end_index = start_index + num_items
+                self.compute_similarity_coefficient()
+
+            print('Finished computing the similarity matrix')
              #   import pickle
              #   with open('similarity_coefficient_dump.pkl', 'wb+') as dump_file:
             #        pickle.dump(self, dump_file)
@@ -121,12 +129,16 @@ class DataStats():
         self.global_average = global_average
 
 
-    def compute_similarity_coefficient(self, similarity_factor=100):
+    def compute_similarity_coefficient(self, similarity_factor=100, start_index=1, end_index=-1):
         movie_averages = np.append(0, np.divide(self.movie_rating_sum[1:], self.movie_rating_count[1:]))
         std_deviation = self.compute_standard_deviation()
         num_points = len(self.mu_data_set[:, MOVIE_INDEX])
         rating_y_index = 0
-        for movie_y in range(1, self.num_movies):
+        if end_index == -1:
+            movie_loop = self.num_movies
+        else:
+            movie_loop = end_index
+        for movie_y in range(start_index, movie_loop):
             rating_x_index = 0
             for movie_x in range(1, self.num_movies):
                 if movie_x > movie_y:

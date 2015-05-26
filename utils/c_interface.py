@@ -50,8 +50,8 @@ def c_svd_update_feature(train_points, users, user_offsets, movies, residuals,
 
 def c_run_svd_plus_epoch(train_points, users, user_offsets, user_rating_count, movies, movie_averages,
                          movie_rating_count, similarity_matrix_rated, num_neighbors, nearest_neighbors_matrix,
-                         similarity_matrix, implicit_preference, explicit_feedback, implicit_feedback, num_features,
-                         offset_learn_rate, feature_learn_rate, feedback_learn_rate, offset_k_factor,
+                         implicit_preference, implicit_preference_sums, explicit_feedback, implicit_feedback,
+                         num_features, offset_learn_rate, feature_learn_rate, feedback_learn_rate, offset_k_factor,
                          feature_k_factor, feedback_k_factor):
     import ctypes
     from ctypes import c_void_p, c_int32, c_float
@@ -82,6 +82,7 @@ def c_run_svd_plus_epoch(train_points, users, user_offsets, user_rating_count, m
         c_int32(num_neighbors),
         c_void_p(nearest_neighbors_matrix.ctypes.data),
         c_void_p(implicit_preference.ctypes.data),
+        c_void_p(implicit_preference_sums.ctypes.data),
         c_void_p(explicit_feedback.ctypes.data),
         c_void_p(implicit_feedback.ctypes.data),
         c_int32(num_features),
