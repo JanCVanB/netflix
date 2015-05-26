@@ -74,17 +74,19 @@ class DataStats():
 
             if fraction == 0:
                 self.compute_similarity_coefficient()
+                self.comput_nearest_neighbors()
             else:
-                num_items = self.num_movies / num_pieces
-                start_index = num_items * fraction
+                num_items = int(self.num_movies / num_pieces) + 1
+                start_index = num_items * (fraction-1)
                 end_index = start_index + num_items
-                self.compute_similarity_coefficient()
+                self.compute_similarity_coefficient(start_index=start_index, end_index=end_index)
+                if fraction == num_pieces:
+                    self.compute_nearest_neighbors()
 
             print('Finished computing the similarity matrix')
              #   import pickle
              #   with open('similarity_coefficient_dump.pkl', 'wb+') as dump_file:
             #        pickle.dump(self, dump_file)
-            self.compute_nearest_neighbors()
             print('Finished computing the nearest neighbors')
             #except Exception as the_exception:
              #   //import pdb
@@ -174,8 +176,8 @@ class DataStats():
             #if movie_y % 1000 == 1:
             print('Similarity coefficient for movie: {}'.format(movie_y))
             rating_y_index += self.movie_rating_count[movie_y]
-        for movie in range(self.num_movies):
-            self.similarity_coefficient[movie, movie:] = self.similarity_coefficient[movie:, movie]
+ #       for movie in range(movie_loop):
+#            self.similarity_coefficient[movie] = self.similarity_coefficient[:, movie]
         print('Similarity coefficient matrix #{}'.format(self.similarity_coefficient))
 
 
@@ -186,8 +188,10 @@ class DataStats():
         #num_points = len(self.mu_data_set[:, MOVIE_INDEX])
         num_y_ratings = self.movie_rating_count[movie_y]
         num_x_ratings = self.movie_rating_count[movie_x]
+        coefficient = np.absolute(num_y_ratings - num_x_ratings)
 
-        self.similarity_coefficient[movie_y, movie_x] = np.absolute(num_y_ratings - num_x_ratings)
+        self.similarity_coefficient[movie_y, movie_x] = coefficient
+        self.similarity_coefficient[movie_x, movie_y] = coefficient        
         #for user_y_count in range(num_y_ratings):
          #   rating_y_user_index = rating_y_index + user_y_count
          #   if rating_x_index >= num_points:

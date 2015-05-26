@@ -33,7 +33,7 @@ def compute_stats_for_data_set_name(name, use_intermediate=False, fraction=0):
             stats.compute_intermediate_stats()
             stats.write_pickle_to_file(intermediate_stats_path, keep_data=True)
     print('Computing stats ...')
-    stats.compute_stats(use_intermediate=use_intermediate, fraction=fraction, num_pieces=20)
+    stats.compute_stats(use_intermediate=use_intermediate, fraction=fraction, num_pieces=50)
     print('Saving stats to file: {}'.format(stats_path))
     stats.write_stats_to_file(file_path=stats_path)
 
