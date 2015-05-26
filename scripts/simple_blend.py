@@ -9,8 +9,6 @@ from utils.data_paths import SUBMISSIONS_DIR_PATH
 OUTPUT_FILE_PATH = os.path.join(SUBMISSIONS_DIR_PATH, 'simple_blend.dta')
 PREDICTION_FILE_PATHS = [os.path.join(SUBMISSIONS_DIR_PATH, 'predictions1.dta'),
                          os.path.join(SUBMISSIONS_DIR_PATH, 'predictions2.dta')]
-PREDICTION_COEFFICIENTS = [0.4,
-                           0.6]
 
 
 def main():
@@ -32,10 +30,9 @@ def get_predictions():
 
 
 def write(predictions):
-    coefficients = np.array(PREDICTION_COEFFICIENTS)
     with open(OUTPUT_FILE_PATH, 'w+') as output_file:
         for prediction_set in predictions:
-            prediction = np.dot(np.ravel(prediction_set), coefficients)
+            prediction = np.average(np.ravel(prediction_set))
             output_file.write('{}\n'.format(prediction))
 
 
