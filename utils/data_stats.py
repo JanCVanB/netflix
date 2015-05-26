@@ -129,6 +129,8 @@ class DataStats():
         for movie_y in range(1, self.num_movies):
             rating_x_index = 0
             for movie_x in range(1, self.num_movies):
+                if movie_x > movie_y:
+                    break
                 with ThreadPoolExecutor(max_workers=8) as e:
                     if rating_x_index < num_points and rating_y_index < num_points:
                         e.submit(self.compute_movie_similarity, rating_y_index, movie_y, movie_averages[movie_y],
@@ -174,8 +176,10 @@ class DataStats():
                         rating_x_index += self.movie_rating_count[movie_x]
                     e.shutdown(wait=True)
             #if movie_y % 1000 == 1:
-            #    print('Similarity coefficient for movie: {}, {}'.format(movie_y, self.similarity_coefficient[movie_y, movie_x]))
+            print('Similarity coefficient for movie: {}'.format(movie_y))
             rating_y_index += self.movie_rating_count[movie_y]
+        for movie in range(self.num_movies):
+            self.similarity_coefficient[movie, movie:] = self.similarity_coefficient[movie:, movie]
         print('Similarity coefficient matrix #{}'.format(self.similarity_coefficient))
 
 
@@ -197,19 +201,21 @@ class DataStats():
             # have user_y rated movie_y: [10]
             # have list of user_x's who rated movie_x[1, 4, 5, 10, 12]
                 # sum = user_y[rating] ... * user_x[rating]
-            """users_that_rated_movie_x = self.data_set[rating_x_index:
-                                                  rating_x_index + self.user_rating_count[user_x] - num_similar_ratings,
-                                                  USER_INDEX]
-            try:
-                user_y_index_for_movie_x = users_that_rated_movie_x.index(user_y)
-                expected_value_sum += (self.mu_data_set[user_y_index_for_movie_x, RATING_INDEX] - x_average) * (
-                                        self.mu_data_set[rating_y_user_index, RATING_INDEX] - y_average)
-                num_similar_ratings += 1
-                rating_x_index += 1
-                print('User_y_index_for_movie_x #{}'.format(user_y_index_for_movie_x))
-            except StopIteration:
-                expected_value_sum += 0"""
-
+#            users_that_rated_movie_x = self.mu_data_set[rating_x_index:
+ #                                                (rating_x_index + self.movie_rating_count[movie_x]),
+  #                                                USER_INDEX]
+   #         print('users that rated movie x {}'.format(users_that_rated_movie_x))
+    #        try:
+     #           user_y_index_for_movie_x = users_that_rated_movie_x.index(user_y)
+ #               expected_value_sum += (self.mu_data_set[user_y_index_for_movie_x, RATING_INDEX]
+                                         # - x_average) * (
+#                                         + self.mu_data_set[rating_y_user_index, RATING_INDEX]) 
+                                         #- y_average)
+      #          num_similar_ratings += 1
+                #rating_x_index += 1
+       #         print('User_y_index_for_movie_x #{}'.format(user_y_index_for_movie_x))
+       #     except ValueError:
+        #        expected_value_sum += 0
             while (user_y > user_x):
                 rating_x_index += 1
                 if rating_x_index >= num_points:
@@ -220,9 +226,9 @@ class DataStats():
                     rating_x_index -= 1
                     break
             if user_x == user_y:
-                expected_value_sum += (self.mu_data_set[rating_x_index, RATING_INDEX] +
+                #expected_value_sum += (self.mu_data_set[rating_x_index, RATING_INDEX] +
                 #    -x_average) * (
-                    self.mu_data_set[rating_y_user_index, RATING_INDEX])
+                #    self.mu_data_set[rating_y_user_index, RATING_INDEX])
                 #    - y_average)
                 num_similar_ratings += 1
                 #print('expected sum #{}'.format(expected_value_sum))
@@ -230,14 +236,15 @@ class DataStats():
                 #print('movie x rating #{}'.format(self.mu_data_set[rating_x_index, RATING_INDEX]))
                 #print('movie y rating #{}'.format(self.mu_data_set[rating_y_user_index, RATING_INDEX]))
                 #print('user #{}'.format(user_x))
-        if num_similar_ratings > 0:
-            correlation_factor = expected_value_sum / num_similar_ratings
+  #      if num_similar_ratings > 0:
+   #         correlation_factor = expected_value_sum / num_similar_ratings
         #    print('Correlation factor_first #{}'.format(correlation_factor))
         #if x_std_dev > 0 and y_std_dev > 0:
         #    correlation_factor /= (y_std_dev * x_std_dev)
-            print('Correlation factor_second #{}'.format(correlation_factor))
-        self.similarity_coefficient[movie_y, movie_x] = np.absolute(num_similar_ratings * correlation_factor /
-                                                                    (num_similar_ratings + similarity_factor))
+        #    print('Correlation factor_second #{}'.format(correlation_factor))
+        #self.similarity_coefficient[movie_y, movie_x] = expected_value_sum / (num_similar_ratings + similarity_factor)
+        self.similarity_coefficient[movie_y, movie_x] = num_similar_ratings
+
 
     def compute_nearest_neighbors(self):
         current_user = 0

@@ -29,9 +29,8 @@ def compute_stats_for_data_set_name(name, use_intermediate=False):
             print('Intermediate file doesnt exist, making..')
             stats.compute_intermediate_stats()
             stats.write_pickle_to_file(intermediate_stats_path, keep_data=True)
-    else:
-        print('Computing stats ...')
-        stats.compute_stats(use_intermediate=use_intermediate)
+    print('Computing stats ...')
+    stats.compute_stats(use_intermediate=use_intermediate)
     print('Saving stats to file: {}'.format(stats_path))
     stats.write_stats_to_file(file_path=stats_path)
 
