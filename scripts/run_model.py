@@ -1,7 +1,9 @@
+from __future__ import print_function
 from math import sqrt
 from os.path import abspath, dirname, join
 import sys
 from time import localtime, strftime
+# TODO: remove git dependency or include it in requirements
 from git import Repo
 import json
 

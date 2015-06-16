@@ -1,8 +1,10 @@
+from __future__ import print_function
 import numpy as np
+import sys
+
 from algorithms.svd import SVD
 from utils.data_io import get_user_movie_time_rating
 import utils.c_interface
-import sys
 
 
 class SVDEuclidean(SVD):

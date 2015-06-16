@@ -2,6 +2,7 @@
 
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 """
+from __future__ import print_function
 import numpy as np
 
 

@@ -1,6 +1,9 @@
 import numpy as np
 import random
-from unittest import mock
+try:
+    from unittest import mock
+except ImportError:  # Python 2
+    import mock
 
 from algorithms import model as model_algorithm
 from algorithms import svd

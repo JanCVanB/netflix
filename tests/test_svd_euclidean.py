@@ -1,5 +1,8 @@
 import numpy as np
-from unittest import mock
+try:
+    from unittest import mock
+except ImportError:  # Python 2
+    import mock
 
 from algorithms import svd, svd_euclidean
 from utils import data_io, data_stats
