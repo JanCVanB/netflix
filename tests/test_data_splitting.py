@@ -1,13 +1,16 @@
+import numpy as np
+import os
+
+from utils import data_paths, data_splitting
+
+
 def test_write_numpy_array_to_file_returns_none():
-    from utils.data_splitting import write_numpy_array_to_file
-    from utils.data_paths import DATA_DIR_PATH
-    import os
-    import numpy as np
     input_array = np.ones((4, 3))
     array_file_name = 'array_test_file.npy'
-    array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
+    array_file_path = os.path.join(data_paths.DATA_DIR_PATH, array_file_name)
     try:
-        return_value = write_numpy_array_to_file(input_array, array_file_path)
+        return_value = data_splitting.write_numpy_array_to_file(input_array,
+                                                                array_file_path)
         assert return_value is None
     finally:
         try:
@@ -17,17 +20,13 @@ def test_write_numpy_array_to_file_returns_none():
 
 
 def test_write_numpy_array_to_file_creates_file():
-    from utils.data_splitting import write_numpy_array_to_file
-    from utils.data_paths import DATA_DIR_PATH
-    import os
-    import numpy as np
     input_array = np.ones((4, 3))
     array_file_name = 'array_test_file.npy'
-    array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
+    array_file_path = os.path.join(data_paths.DATA_DIR_PATH, array_file_name)
     assert not os.path.isfile(array_file_path), ('{} is for test use only'
                                                  .format(array_file_path))
     try:
-        write_numpy_array_to_file(input_array, array_file_path)
+        data_splitting.write_numpy_array_to_file(input_array, array_file_path)
         assertion_message = 'File not created by write_numpy_array_to_file'
         assert os.path.isfile(array_file_path), assertion_message
     finally:
@@ -38,18 +37,14 @@ def test_write_numpy_array_to_file_creates_file():
 
 
 def test_write_numpy_array_to_file_creates_expected_file():
-    from utils.data_splitting import write_numpy_array_to_file
-    from utils.data_paths import DATA_DIR_PATH
-    import os
-    import numpy as np
     input_array = np.ones((4, 3))
     expected_array = np.copy(input_array)
     array_file_name = 'array_test_file.npy'
-    array_file_path = os.path.join(DATA_DIR_PATH, array_file_name)
+    array_file_path = os.path.join(data_paths.DATA_DIR_PATH, array_file_name)
     assert not os.path.isfile(array_file_path), ('{} is for test use only'
                                                  .format(array_file_path))
     try:
-        write_numpy_array_to_file(input_array, array_file_path)
+        data_splitting.write_numpy_array_to_file(input_array, array_file_path)
         actual_array = np.load(array_file_path)
         np.testing.assert_array_equal(actual_array, expected_array)
     finally:
@@ -60,13 +55,11 @@ def test_write_numpy_array_to_file_creates_expected_file():
 
 
 def test_create_numpy_array_from_generator_returns_numpy_array():
-    import numpy as np
-    from utils.data_splitting import create_numpy_array_from_generator
+    overestimated_shape = (10, 1)
 
     def input_generator():
         yield 0
-    overestimated_shape = (10, 1)
-    return_value = create_numpy_array_from_generator(
+    return_value = data_splitting.create_numpy_array_from_generator(
         generator=input_generator,
         overestimated_shape=overestimated_shape
     )
@@ -75,15 +68,13 @@ def test_create_numpy_array_from_generator_returns_numpy_array():
 
 
 def test_create_numpy_array_from_generator_returns_expected_array():
-    import numpy as np
-    from utils.data_splitting import create_numpy_array_from_generator
     expected_array = np.random.randint(0, 999, (5, 4)).astype(np.int32)
     overestimated_shape = (10, 4)
 
     def input_generator():
         for thing in expected_array:
             yield thing
-    actual_array = create_numpy_array_from_generator(
+    actual_array = data_splitting.create_numpy_array_from_generator(
         generator=input_generator,
         overestimated_shape=overestimated_shape
     )
