@@ -3,8 +3,9 @@ import pickle
 from utils.constants import USER_INDEX, MOVIE_INDEX, RATING_INDEX, BLENDING_RATIO
 
 
-class DataStats():
+class DataStats:
     def __init__(self):
+        # TODO: replace empty lists with Nones, for soon-to-be-numpy-array vars
         self.data_set = []
         self.num_users = None
         self.num_movies = None
@@ -30,7 +31,7 @@ class DataStats():
         self.num_movies = np.amax(data_set[:, MOVIE_INDEX]) + 1
 
     def compute_stats(self):
-        if self.data_set == []:
+        if not self.data_set:
             raise Exception('No Data set loaded. Please use DataStats.load_data_set' +
                             '(data_set) to load a data set before calling compute_stats')
         else:
@@ -74,9 +75,9 @@ class DataStats():
         self.user_rating_count = simple_count
 
     def get_baseline(self, user, movie):
-        if self.movie_averages == []:
+        if not self.movie_averages:
             raise Exception('Cannot get baseline: Missing Movie averages!')
-        if self.user_offsets == []:
+        if not self.user_offsets:
             raise Exception('Cannot get baseline: Missing user offsets!')
         mov_avg = self.movie_averages[movie]
         usr_off = self.user_offsets[user]

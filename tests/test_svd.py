@@ -4,7 +4,7 @@ from unittest import mock
 
 from algorithms import model as model_algorithm
 from algorithms import svd
-from utils import constants, data_io, data_stats, data_paths
+from utils import constants, data_io, data_stats
 
 
 MockThatAvoidsErrors = mock.Mock
