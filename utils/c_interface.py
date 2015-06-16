@@ -15,7 +15,8 @@ class CException(Exception):
 
 
 def c_svd_update_feature(train_points, users, user_offsets, movies, residuals,
-                         movie_averages, feature, num_features, learn_rate, k_factor):
+                         movie_averages, feature, num_features, learn_rate,
+                         k_factor):
     import ctypes
     from ctypes import c_void_p, c_int32, c_float
     import os
@@ -26,9 +27,12 @@ def c_svd_update_feature(train_points, users, user_offsets, movies, residuals,
     library_file_name = 'svd.so'
     library_file_path = os.path.join(LIBRARY_DIR_PATH, library_file_name)
     svd_lib = ctypes.cdll.LoadLibrary(library_file_path)
-#    svd_lib.c_update_feature.argtypes = [c_void_p, c_int32, c_void_p, c_void_p, c_int32, c_void_p,
-#                                         c_void_p, c_int32, c_void_p, c_float, c_int32, c_int32]
-#    svd_lib.c_update_feature.restype = c_int32
+    # TODO: remove these two commented-out lines of code?
+    # svd_lib.c_update_feature.argtypes = [c_void_p, c_int32, c_void_p,
+    #                                      c_void_p, c_int32, c_void_p,
+    #                                      c_void_p, c_int32, c_void_p,
+    #                                      c_float, c_int32, c_int32]
+    # svd_lib.c_update_feature.restype = c_int32
     c_update_feature = svd_lib.c_update_feature
     returned_value = c_update_feature(
         c_void_p(train_points.ctypes.data),    # (void*) train_points

@@ -249,7 +249,8 @@ def test_svd_train_updates_all_features_the_expected_number_of_times():
     simple_stats = make_simple_stats()
     number_of_epochs = 3
     model.update_all_features = MockThatTracksCallsWithoutRunning()
-    model.train(simple_train_points, stats=simple_stats, epochs=number_of_epochs)
+    model.train(simple_train_points, stats=simple_stats,
+                epochs=number_of_epochs)
     assert model.update_all_features.call_count == number_of_epochs
 
 

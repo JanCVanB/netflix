@@ -91,4 +91,3 @@ def write_submission(ratings, submission_file_name):
 
 def load_numpy_array_from_file(file_name):
     return np.load(file_name)
-
