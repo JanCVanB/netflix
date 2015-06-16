@@ -37,7 +37,8 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print('\n\tUSAGE:\n')
         print('\tpython3 scripts/run_sort.py DATASET_NAME [notime]')
-        print('\n\t\tDATASET_NAME is the prefix of any of the .npy data files in /netflix/data.')
+        print('\n\t\tDATASET_NAME is the prefix of any of the .npy data files '
+              'in /netflix/data.')
         print('\n\tEx: python3 scripts/run_sort.py valid\n')
     else:
         compute_sort_for_data_set(name=sys.argv[1],

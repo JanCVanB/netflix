@@ -15,7 +15,8 @@ def calculate_rmse(true_ratings, predictions):
     return sqrt(((predictions - true_ratings) ** 2).mean())
 
 
-def predict_and_save_rmse(model, test_points, rmse_file_path, keep_predictions=False,
+def predict_and_save_rmse(model, test_points, rmse_file_path,
+                          keep_predictions=False,
                           predictions_file_name='noname'):
     predictions = model.predict(test_points)
     true_ratings = test_points[:, 3]
@@ -80,7 +81,8 @@ def run(model, train_set_name, test_set_name, run_name, epochs=None,
     if model.num_features is not None:
         print('Number of features:', model.num_features)
     train_file_path = join(DATA_DIR_PATH, train_set_name + '.npy')
-    stats_file_path = join(DATA_DIR_PATH, 'old_stats', train_set_name + '_stats.p')
+    stats_file_path = join(DATA_DIR_PATH, 'old_stats', train_set_name +
+                           '_stats.p')
 
     model.debug = True
     train_points = load_numpy_array_from_file(train_file_path)
@@ -108,7 +110,8 @@ def run(model, train_set_name, test_set_name, run_name, epochs=None,
     )
     print('Wrote run info to ', run_info_file_path)
     rmse_file_path = run_info_file_path.replace('info.json', 'rmse.txt')
-    predictions_file_name = run_info_file_path.split('/')[-1].replace('info.json', 'predictions.dta')
+    predictions_file_name = (run_info_file_path.split('/')[-1]
+                             .replace('info.json', 'predictions.dta'))
     if not run_multi:
         if not feature_epoch_order:
             model.train(train_points, stats=stats, epochs=epochs)
@@ -124,13 +127,16 @@ def run(model, train_set_name, test_set_name, run_name, epochs=None,
                 model.train_more(epochs=1)
             if create_files:
                 print('Predicting "{test}" ratings'.format(test=test_set_name))
-                predict_and_save_rmse(model, test_points=test_points,
-                                      rmse_file_path=rmse_file_path,
-                                      keep_predictions=(create_files and epoch == epochs-1),
-                                      predictions_file_name=predictions_file_name)
+                predict_and_save_rmse(
+                    model, test_points=test_points,
+                    rmse_file_path=rmse_file_path,
+                    keep_predictions=(create_files and epoch == epochs-1),
+                    predictions_file_name=predictions_file_name
+                )
     model.train_points = None
     if create_files:
-        model_file_name = run_info_file_path.split('/')[-1].replace('info.json', 'model.p')
+        model_file_name = (run_info_file_path.split('/')[-1]
+                           .replace('info.json', 'model.p'))
         save_model(model, model_file_name)
         if not run_multi:
             # duplicate save if run_multi

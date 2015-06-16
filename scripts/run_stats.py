@@ -27,7 +27,8 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print('\n\tUSAGE:\n')
         print('\tpython3 scripts/run_stats.py DATASET_NAME')
-        print('\n\t\tDATASET_NAME is the prefix of any of the .npy data files in /netflix/data.')
+        print('\n\t\tDATASET_NAME is the prefix of any of the .npy data files '
+              'in /netflix/data.')
         print('\n\tEx: python3 scripts/run_stats.py valid\n')
     else:
         compute_stats_for_data_set_name(name=sys.argv[1])
