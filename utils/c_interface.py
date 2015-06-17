@@ -27,12 +27,6 @@ def c_svd_update_feature(train_points, users, user_offsets, movies, residuals,
     library_file_name = 'svd.so'
     library_file_path = os.path.join(LIBRARY_DIR_PATH, library_file_name)
     svd_lib = ctypes.cdll.LoadLibrary(library_file_path)
-    # TODO: remove these two commented-out lines of code?
-    # svd_lib.c_update_feature.argtypes = [c_void_p, c_int32, c_void_p,
-    #                                      c_void_p, c_int32, c_void_p,
-    #                                      c_void_p, c_int32, c_void_p,
-    #                                      c_float, c_int32, c_int32]
-    # svd_lib.c_update_feature.restype = c_int32
     c_update_feature = svd_lib.c_update_feature
     returned_value = c_update_feature(
         c_void_p(train_points.ctypes.data),    # (void*) train_points
