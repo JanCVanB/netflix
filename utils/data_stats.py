@@ -33,7 +33,7 @@ class DataStats:
         self.num_movies = np.amax(data_set[:, constants.MOVIE_INDEX]) + 1
 
     def compute_stats(self):
-        if self.data_set == []:
+        if self.data_set == np.array([]):
             raise Exception(
                 'No Data set loaded. '
                 'Please use DataStats.load_data_set(data_set) '
@@ -81,9 +81,9 @@ class DataStats:
         self.user_rating_count = simple_count
 
     def get_baseline(self, user, movie):
-        if self.movie_averages == []:
+        if self.movie_averages == np.array([]):
             raise Exception('Cannot get baseline: Missing Movie averages!')
-        if self.user_offsets == []:
+        if self.user_offsets == np.array([]):
             raise Exception('Cannot get baseline: Missing user offsets!')
         mov_avg = self.movie_averages[movie]
         usr_off = self.user_offsets[user]
