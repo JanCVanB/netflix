@@ -51,8 +51,10 @@ def get_info(rmse_file_paths):
             combined_info_dict[key] = value[0]
         else:
             value.sort()
-            combined_info_dict[key] = ' and '.join([', '.join(str(v) for v in value[:-1]),
-                                                    str(value[-1])])
+            combined_info_dict[key] = ' and '.join(
+                [', '.join(str(v) for v in value[:-1]),
+                 str(value[-1])]
+            )
     return ResultInfo(combined_info_dict)
 
 

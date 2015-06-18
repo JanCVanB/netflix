@@ -1,8 +1,10 @@
+from __future__ import print_function
 import numpy as np
+import sys
+
 from algorithms.svd import SVD
 from utils.data_io import get_user_movie_time_rating
 import utils.c_interface
-import sys
 
 
 class SVDEuclidean(SVD):
@@ -70,7 +72,8 @@ class SVDEuclidean(SVD):
         )
 
     def update_euclidean_all_features(self, user, movie, rating):
-        prediction_error = self.calculate_prediction_error(user=user, movie=movie,
+        prediction_error = self.calculate_prediction_error(user=user,
+                                                           movie=movie,
                                                            rating=rating)
         for feature in range(self.num_features):
             self.update_user_and_movie(user=user, movie=movie, feature=feature,

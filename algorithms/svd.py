@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 import sys
 from time import time
@@ -10,7 +11,8 @@ from utils.data_io import get_user_movie_time_rating
 
 
 class SVD(Model):
-    def __init__(self, learn_rate=0.001, num_features=3, feature_initial=SVD_FEATURE_VALUE_INITIAL, k_factor=0.02):
+    def __init__(self, learn_rate=0.001, num_features=3,
+                 feature_initial=SVD_FEATURE_VALUE_INITIAL, k_factor=0.02):
         self.learn_rate = learn_rate
         self.num_features = num_features
         self.feature_initial = feature_initial
@@ -73,7 +75,8 @@ class SVD(Model):
                 self.update_feature_in_c(feature)
                 sys.stdout.write('=')
                 sys.stdout.flush()
-                if np.isnan(np.sum(self.movies)) or np.isnan(np.sum(self.users)):
+                if (np.isnan(np.sum(self.movies)) or
+                        np.isnan(np.sum(self.users))):
                     print("So, I found a NaN..")
                     import pdb
                     pdb.set_trace()
@@ -87,7 +90,8 @@ class SVD(Model):
                 print('Epoch #{}'.format(epoch + 1))
                 print('movies: {}'.format(self.movies))
                 print('users: {}'.format(self.users))
-                if np.isnan(np.sum(self.movies)) or np.isnan(np.sum(self.users)):
+                if (np.isnan(np.sum(self.movies)) or
+                        np.isnan(np.sum(self.users))):
                     print("So, I found a NaN..")
                     import pdb
                     pdb.set_trace()
@@ -110,7 +114,8 @@ class SVD(Model):
             else:
                 self.update_feature(feature)
             if np.isnan(np.sum(self.movies)) or np.isnan(np.sum(self.users)):
-                print("So, I found a NaN after updating feature {}..".format(feature))
+                print('So, I found a NaN after updating feature {}..'
+                      .format(feature))
                 import pdb
                 pdb.set_trace()
 
@@ -146,15 +151,20 @@ class SVD(Model):
 
     def update_feature_in_c(self, feature):
         c_svd_update_feature(train_points=self.train_points,
-                             users=self.users, user_offsets=self.stats.user_offsets,
-                             movies=self.movies, movie_averages=self.stats.movie_averages,
+                             users=self.users,
+                             user_offsets=self.stats.user_offsets,
+                             movies=self.movies,
+                             movie_averages=self.stats.movie_averages,
                              residuals=self.residuals, feature=feature,
-                             num_features=self.num_features, learn_rate=self.learn_rate, k_factor=self.k_factor)
+                             num_features=self.num_features,
+                             learn_rate=self.learn_rate, k_factor=self.k_factor)
 
     def update_user_and_movie(self, user, movie, feature, error):
-        user_change = self.learn_rate * (error * self.movies[movie, feature]
-                                         - self.k_factor * self.users[user, feature])
-        movie_change = self.learn_rate * (error * self.users[user, feature]
-                                          - self.k_factor * self.movies[movie, feature])
+        user_change = (self.learn_rate *
+                       (error * self.movies[movie, feature] -
+                        self.k_factor * self.users[user, feature]))
+        movie_change = (self.learn_rate *
+                        (error * self.users[user, feature] -
+                         self.k_factor * self.movies[movie, feature]))
         self.users[user, feature] += user_change
         self.movies[movie, feature] += movie_change

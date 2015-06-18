@@ -2,6 +2,7 @@
 
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 """
+from __future__ import print_function
 import numpy as np
 
 
@@ -91,4 +92,3 @@ def write_submission(ratings, submission_file_name):
 
 def load_numpy_array_from_file(file_name):
     return np.load(file_name)
-
