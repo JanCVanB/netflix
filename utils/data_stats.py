@@ -6,17 +6,16 @@ from utils import constants
 
 class DataStats:
     def __init__(self):
-        # TODO: replace empty lists with Nones, for soon-to-be-numpy-array vars
-        self.data_set = []
+        self.data_set = np.array([])
         self.num_users = None
         self.num_movies = None
         self.global_average = None
-        self.movie_averages = []
-        self.movie_rating_count = []
-        self.movie_rating_sum = []
-        self.user_offsets = []
-        self.user_rating_count = []
-        self.user_offsets_sum = []
+        self.movie_averages = np.array([])
+        self.movie_rating_count = np.array([])
+        self.movie_rating_sum = np.array([])
+        self.user_offsets = np.array([])
+        self.user_rating_count = np.array([])
+        self.user_offsets_sum = np.array([])
 
     def init_movie_and_user_arrays(self):
         movies_1d = (self.num_movies,)
