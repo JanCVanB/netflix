@@ -141,8 +141,8 @@ def test_compute_stats_calculates_expected_stats():
 def test_compute_user_stats_calls_appropriate_functions(mock_compute_offsets,
                                                         mock_compute_blended_indexed_averages,
                                                         mock_compute_simple_indexed_sum_and_count):
-    mock_compute_simple_indexed_sum_and_count.return_value = (np.array([0]),
-                                                              np.array([0]))
+    mock_compute_simple_indexed_sum_and_count.return_value = (np.array([1]),
+                                                              np.array([1]))
     mock_compute_blended_indexed_averages.return_value = np.array([0])
     stats = data_stats.DataStats()
     stats.load_data_set(make_simple_test_set())
